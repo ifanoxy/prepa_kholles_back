@@ -1,0 +1,17 @@
+{
+  "name": "prepa_kholles_back",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --watch",
+    "start": "node dist",
+    "dev": "npm run build & npm run start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.1"
+  }
+}
