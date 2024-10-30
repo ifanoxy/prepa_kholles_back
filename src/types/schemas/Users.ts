@@ -6,7 +6,7 @@ interface UsersPrimaryKeys
      * Auto Increment
      * @optional
      */
-    id?: number;
+    id: number | null;
 }
 
 interface UsersKeys
