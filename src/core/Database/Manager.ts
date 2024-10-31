@@ -1,7 +1,8 @@
 import Database from "./Database";
 import {IncludesType} from "../../types/database/Includes";
-import {FieldPacket, ResultSetHeader} from "mysql2";
-import {QueryResult} from "mysql2/promise";
+import {ResultSetHeader} from "mysql2";
+import {PartialKeys} from "../../types/utils/PartialKeys";
+import {NullableKeys} from "../../types/utils/NullableKeys";
 
 export default class Manager<PrimaryKeys extends Record<string, any>, Keys extends Record<string, any>> {
     constructor(private database: Database, public readonly tableName: string)
@@ -72,7 +73,7 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      * @param {PrimaryKeys & Partial<Keys>} where Les conditions d'identifications
      * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      */
-    public async get(where: PrimaryKeys & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> = ["*"]): Promise<PrimaryKeys & Keys>
+    public async get(where: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> = ["*"]): Promise<PrimaryKeys & Keys>
     {
         return (await this.database.query(`SELECT ${includes.join(",")} FROM ${this.tableName} WHERE ${this.formatWhere(where)} LIMIT 1`))[0] as PrimaryKeys & Keys;
     }
@@ -84,7 +85,7 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      * @param {getAllOptions} options les options de la requête
      */
-    public async getAll(where?: PrimaryKeys & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> = ["*"], options: getAllOptions = { offset: 0, limits: 100}): Promise<PrimaryKeys & Keys>
+    public async getAll(where?: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> = ["*"], options: getAllOptions = { offset: 0, limits: 100}): Promise<PrimaryKeys & Keys>
     {
         return (await this.database.query(`SELECT ${includes.join(",")} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""} LIMIT ${options.limits} OFFSET ${options.offset}`)) as unknown as PrimaryKeys & Keys;
     }
@@ -93,7 +94,7 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      * Permet d'ajouter des valeurs ou une liste de valeurs en base de donnée
      * @param {PrimaryKeys & Keys | (PrimaryKeys & Keys)[]} values
      */
-    public async insert(values: PrimaryKeys & Keys | (PrimaryKeys & Keys)[]): Promise<ResultSetHeader>
+    public async insert(values: NullableKeys<PrimaryKeys, "id"> & Keys | (PrimaryKeys & Keys)[]): Promise<ResultSetHeader>
     {
         return (await this.database.query<ResultSetHeader>(`INSERT INTO ${this.tableName} (${Object.keys(values).join(", ")}) VALUES (${Array.isArray(values) ? values.map(x => this.formatValues(Object.values(x))).join("), (") : this.formatValues(Object.values(values))})`));
     }
@@ -103,7 +104,7 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      * @param {PrimaryKeys & Partial<Keys>} where Les conditions d'identifications
      * @param {PrimaryKeys & Keys | (PrimaryKeys & Keys)[]} values
      */
-    public async update(where: PrimaryKeys & Partial<Keys>, values: Partial<PrimaryKeys | Keys>): Promise<ResultSetHeader>
+    public async update(where: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, values: Partial<PrimaryKeys | Keys>): Promise<ResultSetHeader>
     {
         return (await this.database.query<ResultSetHeader>(`UPDATE ${this.tableName} SET ${this.formatSet(values)} WHERE ${this.formatWhere(where)}`));
     }
@@ -112,7 +113,7 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      * Permet de supprimer des lignes en base de donnée
      * @param {PrimaryKeys & Partial<Keys>} where Les conditions d'identifications
      */
-    public async delete(where: PrimaryKeys & Partial<Keys>): Promise<ResultSetHeader>
+    public async delete(where: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>): Promise<ResultSetHeader>
     {
         return (await this.database.query<ResultSetHeader>(`DELETE FROM ${this.tableName} WHERE ${this.formatWhere(where)}`));
     }
@@ -121,16 +122,16 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      * Vérifie si une ligne est existante dans la base de donnée
      * @param {PrimaryKeys & Partial<Keys>} where
      */
-    public async has(where: PrimaryKeys & Partial<Keys>)
+    public async has(where: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>)
     {
-        return ((await this.database.query(`SELECT COUNT(*) as count FROM ${this.tableName} as count WHERE ${this.formatWhere(where)}`))[0] as unknown as { count: number }).count >= 1;
+        return ((await this.database.query(`SELECT COUNT(*) as count FROM ${this.tableName} WHERE ${this.formatWhere(where)}`))[0] as unknown as { count: number }).count >= 1;
     }
 
     /**
      * Retourne une ligne si elle existe sinon renvoie null
      * @param {PrimaryKeys & Partial<Keys>} where
      */
-    public async getIfExists(where: PrimaryKeys & Partial<Keys>): Promise<PrimaryKeys & Partial<Keys> | null>
+    public async getIfExists(where: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>): Promise<PrimaryKeys & Keys | null>
     {
         return await this.has(where) ? this.get(where) : null;
     }

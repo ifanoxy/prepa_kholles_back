@@ -6,7 +6,7 @@ interface UsersPrimaryKeys
      * Auto Increment
      * @optional
      */
-    id: number | null;
+    id: number;
 }
 
 interface UsersKeys
@@ -22,6 +22,4 @@ interface UsersKeys
     permissions: UserPermissions;
 }
 
-type UsersSchema = UsersPrimaryKeys & UsersKeys;
-
-export { UsersSchema, UsersKeys, UsersPrimaryKeys };
+export { UsersKeys, UsersPrimaryKeys };

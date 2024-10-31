@@ -32,6 +32,18 @@ export default class Logger
     }
 
     /**
+     * Afficher un message au niveau Debug de log
+     * @param {any} data les données a afficher
+     */
+    public debug(data: any)
+    {
+        for (let element of this.anyToString(data))
+        {
+            this.write_log(LoggerLevel.Debug, element);
+        }
+    }
+
+    /**
      * Afficher un message au niveau Info de log
      * @param {any} data les données a afficher
      */
@@ -130,13 +142,13 @@ export default class Logger
     private write_log(tag: LoggerLevel, message: string): void
     {
         if (tag >= this.level)
-            console.log(Logger.format_time, LoggerTag[LoggerLevel[tag as unknown as keyof typeof LoggerLevel] as unknown as keyof typeof LoggerTag], "", message);
+            console.log(Logger.format_time, LoggerTag[LoggerLevel[tag as unknown as keyof typeof LoggerLevel] as unknown as keyof typeof LoggerTag], ":", message);
 
         const date = new Date();
 
         const
             dirname = date.toLocaleDateString("fr", { dateStyle: "long" }).slice(3),
-            filename = date.toLocaleDateString("fr", { dateStyle: "medium" });
+            filename = date.toLocaleDateString("fr", { dateStyle: "medium" }) + ".csv";
 
         if (!fs.existsSync(`./logs/${dirname}`))
             fs.mkdirSync(`./logs/${dirname}`);
@@ -150,7 +162,7 @@ export default class Logger
                 `${date.getDay().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear().toString().padStart(2, "0")}`,
                 `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}.${date.getMilliseconds().toString().padStart(2, "0")}`,
                 LoggerLevel[tag],
-                message
+                JSON.stringify(message)
             ].join(";") + "\n"
         );
     }

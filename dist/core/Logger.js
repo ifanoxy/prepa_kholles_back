@@ -128,9 +128,9 @@ class Logger {
      */
     write_log(tag, message) {
         if (tag >= this.level)
-            console.log(Logger.format_time, LoggerTag[LoggerLevel[tag]], "", message);
+            console.log(Logger.format_time, LoggerTag[LoggerLevel[tag]], ":", message);
         const date = new Date();
-        const dirname = date.toLocaleDateString("fr", { dateStyle: "long" }).slice(3), filename = date.toLocaleDateString("fr", { dateStyle: "medium" });
+        const dirname = date.toLocaleDateString("fr", { dateStyle: "long" }).slice(3), filename = date.toLocaleDateString("fr", { dateStyle: "medium" }) + ".csv";
         if (!fs.existsSync(`./logs/${dirname}`))
             fs.mkdirSync(`./logs/${dirname}`);
         if (!fs.existsSync(`./logs/${dirname}/${filename}`))
@@ -139,7 +139,7 @@ class Logger {
             `${date.getDay().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear().toString().padStart(2, "0")}`,
             `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}.${date.getMilliseconds().toString().padStart(2, "0")}`,
             LoggerLevel[tag],
-            message
+            JSON.stringify(message)
         ].join(";") + "\n");
     }
 }

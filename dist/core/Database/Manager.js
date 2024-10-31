@@ -108,7 +108,7 @@ class Manager {
      * @param {PrimaryKeys & Partial<Keys>} where
      */
     async has(where) {
-        return (await this.database.query(`SELECT COUNT(*) as count FROM ${this.tableName} as count WHERE ${this.formatWhere(where)}`))[0].count >= 1;
+        return (await this.database.query(`SELECT COUNT(*) as count FROM ${this.tableName} WHERE ${this.formatWhere(where)}`))[0].count >= 1;
     }
     /**
      * Retourne une ligne si elle existe sinon renvoie null
