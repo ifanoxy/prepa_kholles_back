@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS `users` (
     id INTEGER UNSIGNED AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    username VARCHAR(32) NOT NULL,
+    first_name VARCHAR(32) NOT NULL,
+    last_name VARCHAR(32) NOT NULL,
     password VARCHAR(128) NOT NULL,
+    `group` TINYINT NOT NULL,
     permissions TINYINT UNSIGNED
-)
+);

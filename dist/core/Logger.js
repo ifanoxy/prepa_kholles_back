@@ -48,6 +48,15 @@ class Logger {
         }
     }
     /**
+     * Afficher un message au niveau Debug de log
+     * @param {any} data les données a afficher
+     */
+    debug(data) {
+        for (let element of this.anyToString(data)) {
+            this.write_log(LoggerLevel.Debug, element);
+        }
+    }
+    /**
      * Afficher un message au niveau Info de log
      * @param {any} data les données a afficher
      */

@@ -10,7 +10,8 @@ function default_1(app) {
         }
         const hashed_password = await app.hash_password(req.body.password);
         const user = await app.server.database.users.getIfExists({
-            username: req.body.username,
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
             password: hashed_password
         }).catch(() => null);
         if (!user) {
@@ -20,5 +21,5 @@ function default_1(app) {
         const token = app.generateAPIToken(user.id.toString(), hashed_password);
         res.status(200).json({ token });
     });
-    return "v1/user/auth";
+    return "POST v1/user/gen_token";
 }

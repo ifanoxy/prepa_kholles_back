@@ -16,7 +16,7 @@ export default function (app: App): string
         res.status(200).json({ valid: valid_token === Number(req.body.user_id) });
     });
 
-    return "v1/user/auth";
+    return "POST v1/user/auth";
 }
 
 interface UserAuthBody {

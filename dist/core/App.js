@@ -32,12 +32,14 @@ const fs = __importStar(require("fs"));
 const path_1 = __importDefault(require("path"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const cors_1 = __importDefault(require("cors"));
 class App {
     constructor(server) {
         this.server = server;
         this.app = (0, express_1.default)();
     }
-    init() {
+    async init() {
+        this.app.use((0, cors_1.default)());
         this.app.use(express_1.default.json());
         this.app.use(express_1.default.urlencoded({ extended: true }));
         this.loadRoutes();
@@ -59,7 +61,6 @@ class App {
     }
     loadRoutes() {
         const files = this.getFiles("./dist/routes");
-        console.log(files);
         for (let file of files) {
             const raw = require(path_1.default.join(process.cwd(), file));
             const route = raw.default(this);
@@ -79,24 +80,36 @@ class App {
         });
     }
     /**
-     * Permet de vérifier si le token est valide
-     * @param {string} user_id
-     * @param {string} hashed_password
+     * Permet d'obtenir l'identifiant d'utilisateur avec son token. Retourne false en cas d'échec
      * @param {string} token
      */
-    verifyToken(user_id, hashed_password, token) {
+    async getUserIdByToken(token) {
         try {
             const decoded = jsonwebtoken_1.default.verify(token, process.env.API_TOKEN_SECRET_KEY);
-            return decoded.hashed_password === hashed_password && decoded.user_id === user_id;
+            const user = await this.server.database.users.getIfExists({
+                id: Number(decoded.user_id)
+            }).catch(() => null);
+            if (!user)
+                return false;
+            return decoded.hashed_password === user.password ? user.id : false;
         }
         catch (err) {
             return false;
         }
     }
+    /**
+     * Permet de hasher un mot de passe en utilisant la librairie bcrypt
+     * @param {string} password
+     */
     async hash_password(password) {
         const saltRounds = 10;
         return await bcrypt_1.default.hash(password, saltRounds);
     }
+    /**
+     * Vérifie si la liste de clé se trouve dans un objet passer en paramètre. Renvoie une liste d'erreurs
+     * @param {string[]} keys
+     * @param {Record<string, any>} body
+     */
     checkBodyParam(keys, body) {
         const errors = [];
         for (const key of keys) {

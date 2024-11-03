@@ -4,6 +4,7 @@ import * as fs from "fs";
 import path from "path";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import cors from "cors";
 
 export class App {
     public app: Express;
@@ -15,14 +16,15 @@ export class App {
         this.app = express();
     }
 
-    public init()
+    public async init()
     {
+        this.app.use(cors())
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
 
         this.loadRoutes();
 
-        this.app.listen(process.env.API_PORT, () => this.server.log.info(`L'API est sur écoute sur le port ${process.env.API_PORT}`))
+        this.app.listen(process.env.API_PORT, () => this.server.log.info(`L'API est sur écoute sur le port ${process.env.API_PORT}`));
     }
 
     /**

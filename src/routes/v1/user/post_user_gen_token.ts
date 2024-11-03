@@ -14,7 +14,8 @@ export default function (app: App): string
         const hashed_password = await app.hash_password(req.body.password);
 
         const user = await app.server.database.users.getIfExists({
-            username: req.body.username,
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
             password: hashed_password
         }).catch(() => null);
 
@@ -29,10 +30,11 @@ export default function (app: App): string
         res.status(200).json({ token })
     });
 
-    return "v1/user/gen_token";
+    return "POST v1/user/gen_token";
 }
 
 interface UserGenTokenBody {
-    username: string,
+    first_name: string,
+    last_name: string,
     password: string,
 }

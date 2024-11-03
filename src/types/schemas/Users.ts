@@ -14,11 +14,16 @@ interface UsersKeys
     /**
      * Longueur maximal 32
      */
-    username: string;
+    first_name: string;
+    /**
+     * Longueur maximal 32
+     */
+    last_name: string;
     /**
      * Longueur maximal 128
      */
     password: string;
+    group: number;
     permissions: UserPermissions;
 }
 

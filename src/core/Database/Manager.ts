@@ -75,7 +75,7 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      */
     public async get(where: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> = ["*"]): Promise<PrimaryKeys & Keys>
     {
-        return (await this.database.query(`SELECT ${includes.join(",")} FROM ${this.tableName} WHERE ${this.formatWhere(where)} LIMIT 1`))[0] as PrimaryKeys & Keys;
+        return (await this.database.query(`SELECT \`${includes.join("\`,\`")}\` FROM ${this.tableName} WHERE ${this.formatWhere(where)} LIMIT 1`))[0] as PrimaryKeys & Keys;
     }
 
     /**
@@ -87,16 +87,16 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      */
     public async getAll(where?: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> = ["*"], options: getAllOptions = { offset: 0, limits: 100}): Promise<PrimaryKeys & Keys>
     {
-        return (await this.database.query(`SELECT ${includes.join(",")} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""} LIMIT ${options.limits} OFFSET ${options.offset}`)) as unknown as PrimaryKeys & Keys;
+        return (await this.database.query(`SELECT \`${includes.join("\`,\`")}\` FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""} LIMIT ${options.limits} OFFSET ${options.offset}`)) as unknown as PrimaryKeys & Keys;
     }
 
     /**
      * Permet d'ajouter des valeurs ou une liste de valeurs en base de donnée
      * @param {PrimaryKeys & Keys | (PrimaryKeys & Keys)[]} values
      */
-    public async insert(values: NullableKeys<PrimaryKeys, "id"> & Keys | (PrimaryKeys & Keys)[]): Promise<ResultSetHeader>
+    public async insert(values: NullableKeys<PrimaryKeys, "id"> & Keys | (NullableKeys<PrimaryKeys, "id"> & Keys)[]): Promise<ResultSetHeader>
     {
-        return (await this.database.query<ResultSetHeader>(`INSERT INTO ${this.tableName} (${Object.keys(values).join(", ")}) VALUES (${Array.isArray(values) ? values.map(x => this.formatValues(Object.values(x))).join("), (") : this.formatValues(Object.values(values))})`));
+        return (await this.database.query<ResultSetHeader>(`INSERT INTO ${this.tableName} (\`${Array.isArray(values) ? Object.keys(values[0]).join("\`, \`") : Object.keys(values).join("\`, \`")}\`) VALUES (${Array.isArray(values) ? values.map(x => this.formatValues(Object.values(x))).join("), (") : this.formatValues(Object.values(values))})`));
     }
 
     /**

@@ -69,7 +69,7 @@ class Manager {
      * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      */
     async get(where, includes = ["*"]) {
-        return (await this.database.query(`SELECT ${includes.join(",")} FROM ${this.tableName} WHERE ${this.formatWhere(where)} LIMIT 1`))[0];
+        return (await this.database.query(`SELECT \`${includes.join("\`,\`")}\` FROM ${this.tableName} WHERE ${this.formatWhere(where)} LIMIT 1`))[0];
     }
     /**
      * Obtenir une liste de valeurs de la base de donnée
@@ -79,14 +79,14 @@ class Manager {
      * @param {getAllOptions} options les options de la requête
      */
     async getAll(where, includes = ["*"], options = { offset: 0, limits: 100 }) {
-        return (await this.database.query(`SELECT ${includes.join(",")} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""} LIMIT ${options.limits} OFFSET ${options.offset}`));
+        return (await this.database.query(`SELECT \`${includes.join("\`,\`")}\` FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""} LIMIT ${options.limits} OFFSET ${options.offset}`));
     }
     /**
      * Permet d'ajouter des valeurs ou une liste de valeurs en base de donnée
      * @param {PrimaryKeys & Keys | (PrimaryKeys & Keys)[]} values
      */
     async insert(values) {
-        return (await this.database.query(`INSERT INTO ${this.tableName} (${Object.keys(values).join(", ")}) VALUES (${Array.isArray(values) ? values.map(x => this.formatValues(Object.values(x))).join("), (") : this.formatValues(Object.values(values))})`));
+        return (await this.database.query(`INSERT INTO ${this.tableName} (\`${Array.isArray(values) ? Object.keys(values[0]).join("\`, \`") : Object.keys(values).join("\`, \`")}\`) VALUES (${Array.isArray(values) ? values.map(x => this.formatValues(Object.values(x))).join("), (") : this.formatValues(Object.values(values))})`));
     }
     /**
      * Permet d'ajouter des valeurs ou une liste de valeurs en base de donnée
