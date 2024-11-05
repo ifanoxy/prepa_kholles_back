@@ -39,7 +39,9 @@ class App {
         this.app = (0, express_1.default)();
     }
     async init() {
-        this.app.use((0, cors_1.default)());
+        this.app.use((0, cors_1.default)({
+            origin: "*",
+        }));
         this.app.use(express_1.default.json());
         this.app.use(express_1.default.urlencoded({ extended: true }));
         this.loadRoutes();
@@ -69,7 +71,7 @@ class App {
     }
     /**
      * Génère un Token api à partir de l'identifiant de l'utilisateur et de son mot de passe
-     * @param {string} user_id
+     * @param {string | number} user_id
      * @param {string} hashed_password
      */
     generateAPIToken(user_id, hashed_password) {
@@ -92,6 +94,19 @@ class App {
             if (!user)
                 return false;
             return decoded.hashed_password === user.password ? user.id : false;
+        }
+        catch (err) {
+            return false;
+        }
+    }
+    /**
+     * Permet de vérifier un mot de passe hasher et un mot de passe. Retourne false en cas d'échec
+     * @param password
+     * @param hashed_password
+     */
+    async checkHashPassword(password, hashed_password) {
+        try {
+            return await bcrypt_1.default.compare(password, hashed_password);
         }
         catch (err) {
             return false;

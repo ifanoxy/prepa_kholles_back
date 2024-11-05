@@ -68,8 +68,8 @@ class Manager {
      * @param {PrimaryKeys & Partial<Keys>} where Les conditions d'identifications
      * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      */
-    async get(where, includes = ["*"]) {
-        return (await this.database.query(`SELECT \`${includes.join("\`,\`")}\` FROM ${this.tableName} WHERE ${this.formatWhere(where)} LIMIT 1`))[0];
+    async get(where, includes = "*") {
+        return (await this.database.query(`SELECT ${includes === "*" ? "*" : ("`" + includes.join("\`,\`") + "`")} FROM ${this.tableName} WHERE ${this.formatWhere(where)} LIMIT 1`))[0];
     }
     /**
      * Obtenir une liste de valeurs de la base de donnée
@@ -78,8 +78,8 @@ class Manager {
      * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      * @param {getAllOptions} options les options de la requête
      */
-    async getAll(where, includes = ["*"], options = { offset: 0, limits: 100 }) {
-        return (await this.database.query(`SELECT \`${includes.join("\`,\`")}\` FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""} LIMIT ${options.limits} OFFSET ${options.offset}`));
+    async getAll(where, includes = "*", options = { offset: 0, limits: 100 }) {
+        return (await this.database.query(`SELECT ${includes === "*" ? "*" : ("`" + includes.join("\`,\`") + "`")} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""} LIMIT ${options.limits} OFFSET ${options.offset}`));
     }
     /**
      * Permet d'ajouter des valeurs ou une liste de valeurs en base de donnée
@@ -113,9 +113,10 @@ class Manager {
     /**
      * Retourne une ligne si elle existe sinon renvoie null
      * @param {PrimaryKeys & Partial<Keys>} where
+     * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      */
-    async getIfExists(where) {
-        return await this.has(where) ? this.get(where) : null;
+    async getIfExists(where, includes = "*") {
+        return await this.has(where) ? this.get(where, includes) : null;
     }
     /**
      * Modifie ou Ajoute une ligne dans la base de donnée

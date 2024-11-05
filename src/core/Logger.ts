@@ -147,8 +147,11 @@ export default class Logger
         const date = new Date();
 
         const
-            dirname = date.toLocaleDateString("fr", { dateStyle: "long" }).slice(3),
+            dirname = date.toLocaleDateString("fr", { dateStyle: "long" }).split(" ")[1],
             filename = date.toLocaleDateString("fr", { dateStyle: "medium" }) + ".csv";
+
+        if (!fs.existsSync(`./logs`))
+            fs.mkdirSync(`./logs`);
 
         if (!fs.existsSync(`./logs/${dirname}`))
             fs.mkdirSync(`./logs/${dirname}`);

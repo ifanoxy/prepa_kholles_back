@@ -4,6 +4,7 @@ import {Connection} from "mysql2/promise";
 import Manager from "./Manager";
 import {UsersKeys, UsersPrimaryKeys} from "../../types/schemas/Users";
 import * as fs from "fs";
+import {UserPermissions} from "../../types/UserPermissions";
 
 export default class Database
 {
@@ -28,6 +29,7 @@ export default class Database
             throw new Error("Identifiants de connexion à la base de donnée manquants");
 
         this.connection = await createConnection({ host, port, user, password, database });
+
     }
 
     /**

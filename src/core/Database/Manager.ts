@@ -73,9 +73,9 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      * @param {PrimaryKeys & Partial<Keys>} where Les conditions d'identifications
      * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      */
-    public async get(where: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> = ["*"]): Promise<PrimaryKeys & Keys>
+    public async get(where: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> | "*" = "*"): Promise<PrimaryKeys & Keys>
     {
-        return (await this.database.query(`SELECT \`${includes.join("\`,\`")}\` FROM ${this.tableName} WHERE ${this.formatWhere(where)} LIMIT 1`))[0] as PrimaryKeys & Keys;
+        return (await this.database.query(`SELECT ${includes === "*" ? "*" :("`" + includes.join("\`,\`") + "`")} FROM ${this.tableName} WHERE ${this.formatWhere(where)} LIMIT 1`))[0] as PrimaryKeys & Keys;
     }
 
     /**
@@ -85,9 +85,9 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      * @param {getAllOptions} options les options de la requête
      */
-    public async getAll(where?: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> = ["*"], options: getAllOptions = { offset: 0, limits: 100}): Promise<PrimaryKeys & Keys>
+    public async getAll(where?: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> | "*" = "*", options: getAllOptions = { offset: 0, limits: 100}): Promise<PrimaryKeys & Keys>
     {
-        return (await this.database.query(`SELECT \`${includes.join("\`,\`")}\` FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""} LIMIT ${options.limits} OFFSET ${options.offset}`)) as unknown as PrimaryKeys & Keys;
+        return (await this.database.query(`SELECT ${includes === "*" ? "*" :("`" + includes.join("\`,\`") + "`")} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""} LIMIT ${options.limits} OFFSET ${options.offset}`)) as unknown as PrimaryKeys & Keys;
     }
 
     /**
@@ -130,10 +130,11 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
     /**
      * Retourne une ligne si elle existe sinon renvoie null
      * @param {PrimaryKeys & Partial<Keys>} where
+     * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      */
-    public async getIfExists(where: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>): Promise<PrimaryKeys & Keys | null>
+    public async getIfExists(where: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> | "*" = "*"): Promise<PrimaryKeys & Keys | null>
     {
-        return await this.has(where) ? this.get(where) : null;
+        return await this.has(where) ? this.get(where, includes) : null;
     }
 
     /**

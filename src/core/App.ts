@@ -18,7 +18,9 @@ export class App {
 
     public async init()
     {
-        this.app.use(cors())
+        this.app.use(cors({
+            origin: "*",
+        }))
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
 
@@ -60,10 +62,10 @@ export class App {
 
     /**
      * Génère un Token api à partir de l'identifiant de l'utilisateur et de son mot de passe
-     * @param {string} user_id
+     * @param {string | number} user_id
      * @param {string} hashed_password
      */
-    public generateAPIToken(user_id: string, hashed_password: string)
+    public generateAPIToken(user_id: string | number, hashed_password: string)
     {
         if (!process.env.API_TOKEN_SECRET_KEY)
             this.server.log.fatal("Variables d'environnement manquante API_TOKEN_SECRET_KEY");
@@ -94,6 +96,20 @@ export class App {
                 return false;
 
             return decoded.hashed_password === user.password ? user.id : false;
+        } catch (err) {
+            return false;
+        }
+    }
+
+    /**
+     * Permet de vérifier un mot de passe hasher et un mot de passe. Retourne false en cas d'échec
+     * @param password
+     * @param hashed_password
+     */
+    public async checkHashPassword(password: string, hashed_password: string): Promise<boolean>
+    {
+        try {
+            return await bcrypt.compare(password, hashed_password);
         } catch (err) {
             return false;
         }

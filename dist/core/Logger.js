@@ -139,7 +139,9 @@ class Logger {
         if (tag >= this.level)
             console.log(Logger.format_time, LoggerTag[LoggerLevel[tag]], ":", message);
         const date = new Date();
-        const dirname = date.toLocaleDateString("fr", { dateStyle: "long" }).slice(3), filename = date.toLocaleDateString("fr", { dateStyle: "medium" }) + ".csv";
+        const dirname = date.toLocaleDateString("fr", { dateStyle: "long" }).split(" ")[1], filename = date.toLocaleDateString("fr", { dateStyle: "medium" }) + ".csv";
+        if (!fs.existsSync(`./logs`))
+            fs.mkdirSync(`./logs`);
         if (!fs.existsSync(`./logs/${dirname}`))
             fs.mkdirSync(`./logs/${dirname}`);
         if (!fs.existsSync(`./logs/${dirname}/${filename}`))
