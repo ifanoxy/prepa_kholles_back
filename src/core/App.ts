@@ -21,8 +21,8 @@ export class App {
         this.app.use(cors({
             origin: "*",
         }))
-        this.app.use(express.json({ limit: '16mb' }));
-        this.app.use(express.urlencoded({ extended: true, limit: "16mb" }));
+        this.app.use(express.json({ limit: '16Mb' }));
+        this.app.use(express.urlencoded({ extended: true, limit: "16Mb" }));
 
         this.loadRoutes();
 
