@@ -14,8 +14,10 @@ function default_1(app) {
             return;
         }
         const user_id = await app.getUserIdByToken(req.headers?.authorization.split(' ')[1]);
-        if (!user_id)
+        if (!user_id) {
+            res.status(401).send("Unauthorized");
             return;
+        }
         await app.server.database.sujets.insert({
             id: null,
             matiere_id: req.body.matiere_id,

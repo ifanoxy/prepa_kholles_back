@@ -42,7 +42,7 @@ class App {
         this.app.use((0, cors_1.default)({
             origin: "*",
         }));
-        this.app.use(express_1.default.json({ limit: '16mb' }));
+        this.app.use(express_1.default.json({ limit: '16Mb' }));
         this.app.use(express_1.default.urlencoded({ extended: true, limit: "16mb" }));
         this.loadRoutes();
         this.app.listen(process.env.API_PORT, () => this.server.log.info(`L'API est sur écoute sur le port ${process.env.API_PORT}`));

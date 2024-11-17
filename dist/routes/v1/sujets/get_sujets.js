@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
+const compression_1 = require("../../../utils/compression");
 function default_1(app) {
     app.app.get("/v1/sujets", async (req, res) => {
         const token = req.headers?.authorization?.split(' ')[1];
@@ -14,7 +15,11 @@ function default_1(app) {
             const matiere = await app.server.database.matieres.getIfExists({ id: sujet.matiere_id });
             const chapitre = sujet.chapitre_id ? await app.server.database.chapitres.get({ id: sujet.chapitre_id }) : null;
             return {
-                image: sujet.image,
+                image: await (0, compression_1.compressImage)(sujet.image.toString(), {
+                    quality: 75,
+                    maxWidth: 800,
+                    maxHeight: 800,
+                }),
                 author: author,
                 chapitre: chapitre,
                 matiere: matiere

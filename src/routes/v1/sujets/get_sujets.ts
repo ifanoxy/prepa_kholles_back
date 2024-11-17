@@ -1,5 +1,6 @@
 import {App} from "../../../core/App";
 import {Request} from "express"
+import {compressImage} from "../../../utils/compression";
 
 export default function (app: App): string
 {
@@ -19,7 +20,11 @@ export default function (app: App): string
             const chapitre = sujet.chapitre_id ? await app.server.database.chapitres.get({ id: sujet.chapitre_id }) : null;
 
             return {
-                image: sujet.image,
+                image: await compressImage(sujet.image.toString(), {
+                    quality: 75,
+                    maxWidth: 800,
+                    maxHeight: 800,
+                }),
                 author: author,
                 chapitre: chapitre,
                 matiere: matiere
