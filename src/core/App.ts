@@ -22,7 +22,7 @@ export class App {
             origin: "*",
         }))
         this.app.use(express.json({ limit: '16Mb' }));
-        this.app.use(express.urlencoded({ extended: true, limit: "16Mb" }));
+        this.app.use(express.urlencoded({ extended: true, limit: "16mb" }));
 
         this.loadRoutes();
 
