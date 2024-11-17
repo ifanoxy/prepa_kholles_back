@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `sujets` (
     id INTEGER UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
     author_id INTEGER UNSIGNED NOT NULL,
     matiere_id INTEGER UNSIGNED NOT NULL,
-    chapitre_id INTEGER UNSIGNED NOT NULL,
+    chapitre_id INTEGER UNSIGNED,
     image MEDIUMBLOB NOT NULL,
     FOREIGN KEY (author_id) REFERENCES users(id)
         ON DELETE CASCADE
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `sujets` (
     FOREIGN KEY (matiere_id) REFERENCES matieres(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    FOREIGN KEY (chapitre_id) REFERENCES chapitre(id)
+    FOREIGN KEY (chapitre_id) REFERENCES chapitres(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );

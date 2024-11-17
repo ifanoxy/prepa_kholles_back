@@ -85,9 +85,9 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      * @param {getAllOptions} options les options de la requête
      */
-    public async getAll(where?: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> | "*" = "*", options: getAllOptions = { offset: 0, limits: 100}): Promise<PrimaryKeys & Keys>
+    public async getAll(where?: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> | "*" = "*", options: getAllOptions = { offset: 0, limits: 100}): Promise<(PrimaryKeys & Keys)[]>
     {
-        return (await this.database.query(`SELECT ${includes === "*" ? "*" :("`" + includes.join("\`,\`") + "`")} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""} LIMIT ${options.limits} OFFSET ${options.offset}`)) as unknown as PrimaryKeys & Keys;
+        return (await this.database.query(`SELECT ${includes === "*" ? "*" :("`" + includes.join("\`,\`") + "`")} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""} LIMIT ${options.limits ?? 10} OFFSET ${options.offset ?? 0}`)) as unknown as (PrimaryKeys & Keys)[];
     }
 
     /**
@@ -153,10 +153,10 @@ interface getAllOptions {
      * L'indice du première élément que à partir duquel on souhaite récupérer les données
      * Defaut: 0
      */
-    offset: number;
+    offset?: number;
     /**
      * Le nombre maximal d'élement que l'on souhaite récupérer
      * Default: 100
      */
-    limits: number;
+    limits?: number;
 }

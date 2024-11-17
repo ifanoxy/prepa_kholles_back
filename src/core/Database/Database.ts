@@ -4,12 +4,18 @@ import {Connection} from "mysql2/promise";
 import Manager from "./Manager";
 import {UsersKeys, UsersPrimaryKeys} from "../../types/schemas/Users";
 import * as fs from "fs";
-import {UserPermissions} from "../../types/UserPermissions";
+import {ChapitresKeys, ChapitresPrimaryKey} from "../../types/schemas/Chapitres";
+import {MatieresKeys, MatieresPrimaryKeys} from "../../types/schemas/Matieres";
+import {SujetsKeys, SujetsPrimaryKeys} from "../../types/schemas/Sujets";
 
 export default class Database
 {
     private connection: Connection | undefined;
     public users!: Manager<UsersPrimaryKeys, UsersKeys>;
+    public chapitres!: Manager<ChapitresPrimaryKey, ChapitresKeys>;
+    public matieres!: Manager<MatieresPrimaryKeys, MatieresKeys>;
+    public sujets!: Manager<SujetsPrimaryKeys, SujetsKeys>;
+
     constructor(private readonly server: Server) {}
 
     /**
@@ -38,6 +44,9 @@ export default class Database
     public async loadManagers(): Promise<void>
     {
         this.users = new Manager<UsersPrimaryKeys, UsersKeys>(this, "users");
+        this.chapitres = new Manager<ChapitresPrimaryKey, ChapitresKeys>(this, "chapitres");
+        this.matieres = new Manager<MatieresPrimaryKeys, MatieresKeys>(this, "matieres");
+        this.sujets = new Manager<SujetsPrimaryKeys, SujetsKeys>(this, "sujets");
     }
 
     /**
@@ -61,7 +70,8 @@ export default class Database
      */
     public async query<T extends QueryResult = RowDataPacket[]>(query: string): Promise<T>
     {
-        this.server.log.trace(query);
+        if (query.length <= 200)
+            this.server.log.trace(query);
         return (await this.connection!.query(query))[0] as T;
     }
 }

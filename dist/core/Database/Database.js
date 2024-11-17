@@ -48,6 +48,9 @@ class Database {
      */
     async loadManagers() {
         this.users = new Manager_1.default(this, "users");
+        this.chapitres = new Manager_1.default(this, "chapitres");
+        this.matieres = new Manager_1.default(this, "matieres");
+        this.sujets = new Manager_1.default(this, "sujets");
     }
     /**
      * Charger les tables de la base de donnée
@@ -64,7 +67,8 @@ class Database {
      * @param {string} query
      */
     async query(query) {
-        this.server.log.trace(query);
+        if (query.length <= 200)
+            this.server.log.trace(query);
         return (await this.connection.query(query))[0];
     }
 }

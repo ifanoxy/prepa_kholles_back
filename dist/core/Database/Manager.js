@@ -79,7 +79,7 @@ class Manager {
      * @param {getAllOptions} options les options de la requête
      */
     async getAll(where, includes = "*", options = { offset: 0, limits: 100 }) {
-        return (await this.database.query(`SELECT ${includes === "*" ? "*" : ("`" + includes.join("\`,\`") + "`")} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""} LIMIT ${options.limits} OFFSET ${options.offset}`));
+        return (await this.database.query(`SELECT ${includes === "*" ? "*" : ("`" + includes.join("\`,\`") + "`")} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""} LIMIT ${options.limits ?? 10} OFFSET ${options.offset ?? 0}`));
     }
     /**
      * Permet d'ajouter des valeurs ou une liste de valeurs en base de donnée
