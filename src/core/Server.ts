@@ -1,6 +1,7 @@
 import Database from "./Database/Database";
 import Logger from "./Logger";
 import {App} from "./App";
+import {UserPermissions} from "../types/UserPermissions";
 
 export default class Server {
     public database: Database;
@@ -19,6 +20,7 @@ export default class Server {
         await this.database.authenticate();
         await this.database.loadTables();
         await this.database.loadManagers();
+
         this.app.init();
     }
 }
