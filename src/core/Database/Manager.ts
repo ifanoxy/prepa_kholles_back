@@ -85,9 +85,9 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      * @param {getAllOptions} options les options de la requête
      */
-    public async getAll(where?: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> | "*" = "*", options: getAllOptions = { offset: 0, limits: 100}): Promise<(PrimaryKeys & Keys)[]>
+    public async getAll(where?: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> | "*" = "*", options: getAllOptions = { offset: 0, limits: 100, orderBy: ""}): Promise<(PrimaryKeys & Keys)[]>
     {
-        return (await this.database.query(`SELECT ${includes === "*" ? "*" :("`" + includes.join("\`,\`") + "`")} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""} LIMIT ${options.limits ?? 10} OFFSET ${options.offset ?? 0}`)) as unknown as (PrimaryKeys & Keys)[];
+        return (await this.database.query(`SELECT ${includes === "*" ? "*" :("`" + includes.join("\`,\`") + "`")} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""}${options.orderBy ? `ORDER BY ${options.orderBy}` : ''} LIMIT ${options.limits ?? 10} OFFSET ${options.offset ?? 0}`)) as unknown as (PrimaryKeys & Keys)[];
     }
 
     /**
@@ -159,4 +159,5 @@ interface getAllOptions {
      * Default: 100
      */
     limits?: number;
+    orderBy?: string;
 }

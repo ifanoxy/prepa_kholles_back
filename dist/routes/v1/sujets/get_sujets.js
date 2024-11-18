@@ -9,7 +9,7 @@ function default_1(app) {
             res.status(401).send("Unauthorized");
             return;
         }
-        const sujets = await app.server.database.sujets.getAll(undefined, ['image', 'author_id', 'chapitre_id', 'matiere_id'], { limits: 25 });
+        const sujets = await app.server.database.sujets.getAll(undefined, ['image', 'author_id', 'chapitre_id', 'matiere_id'], { limits: 25, orderBy: "id DESC" });
         const sujetsData = await Promise.all(sujets.map(async (sujet) => {
             const author = await app.server.database.users.getIfExists({ id: sujet.author_id }, ['first_name', 'last_name']);
             const matiere = await app.server.database.matieres.getIfExists({ id: sujet.matiere_id });

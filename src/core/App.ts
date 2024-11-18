@@ -29,7 +29,7 @@ export class App {
         this.app.listen(process.env.API_PORT, () => this.server.log.info(`L'API est sur écoute sur le port ${process.env.API_PORT}`));
     }
 
-    async isAuth(token: string): Promise<boolean | number>
+    async isAuth(token: string): Promise<false | number>
     {
         try {
             return await this.getUserIdByToken(token);
