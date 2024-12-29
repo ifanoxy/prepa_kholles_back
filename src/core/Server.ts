@@ -9,13 +9,9 @@ export default class Server {
     public app: App;
 
     constructor() {
-        this.log = new Logger();
-        while (true)
-        {
-            console.log("ajzdoi")
-        }
-        this.app = new App(this);
         this.database = new Database(this);
+        this.log = new Logger();
+        this.app = new App(this);
     }
 
     async init()
