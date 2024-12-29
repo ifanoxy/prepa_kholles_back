@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     identifiant VARCHAR(32) NOT NULL,
     password VARCHAR(128) NOT NULL,
     `group` TINYINT NOT NULL,
-    permission TINYINT UNSIGNED,
+    permission INTEGER UNSIGNED,
     FOREIGN KEY (permission) REFERENCES permissions(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
