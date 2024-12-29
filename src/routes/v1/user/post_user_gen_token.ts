@@ -4,7 +4,7 @@ import {Request} from "express"
 export default function (app: App): string
 {
     app.app.post("/v1/user/gen_token", async (req: Request<{}, {}, UserGenTokenBody>, res) => {
-        const errors = app.checkBodyParam(["password", "username"], req.body);
+        const errors = app.checkBodyParam(["password", "identifiant"], req.body);
 
         if (errors.length > 0) {
             res.status(400).json({ errors });
@@ -14,8 +14,7 @@ export default function (app: App): string
         const hashed_password = await app.hash_password(req.body.password);
 
         const user = await app.server.database.users.getIfExists({
-            first_name: req.body.first_name,
-            last_name: req.body.last_name,
+            identifiant: req.body.identifiant,
             password: hashed_password
         }).catch(() => null);
 
@@ -34,7 +33,6 @@ export default function (app: App): string
 }
 
 interface UserGenTokenBody {
-    first_name: string,
-    last_name: string,
+    identifiant: string,
     password: string,
 }

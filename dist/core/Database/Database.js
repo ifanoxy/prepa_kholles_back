@@ -51,6 +51,9 @@ class Database {
         this.chapitres = new Manager_1.default(this, "chapitres");
         this.matieres = new Manager_1.default(this, "matieres");
         this.sujets = new Manager_1.default(this, "sujets");
+        this.permissions = new Manager_1.default(this, "permissions");
+        this.comments = new Manager_1.default(this, "commentaires");
+        this.planning = new Manager_1.default(this, "kholle_schedule");
     }
     /**
      * Charger les tables de la base de donnée

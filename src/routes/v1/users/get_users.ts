@@ -5,7 +5,7 @@ export default function (app: App): string
 {
     app.app.get("/v1/users", async (req, res) => {
 
-        const users = await app.server.database.users.getAll(undefined, ["first_name", "last_name"]);
+        const users = await app.server.database.users.getAll(undefined, ["first_name", "last_name", "group"]);
 
         res.status(200).json({ data: users });
     });

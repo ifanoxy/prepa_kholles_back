@@ -5,6 +5,7 @@ import path from "path";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cors from "cors";
+import {UserPermissions} from "../types/UserPermissions";
 
 export class App {
     public app: Express;
@@ -36,6 +37,42 @@ export class App {
         } catch {
             return false
         }
+    }
+
+    async isMod(user_id: number): Promise<boolean>
+    {
+        const user = await this.server.database.users.getIfExists({ id: user_id });
+        if (!user)return false;
+        return [
+            UserPermissions.ADMINISTRATRICE,
+            UserPermissions.ADMINISTRATEUR,
+            UserPermissions.MODERATEUR,
+            UserPermissions.MODERATRICE,
+        ].includes(user.permission)
+    }
+
+
+    async isAdmin(user_id: number): Promise<boolean>
+    {
+        const user = await this.server.database.users.getIfExists({ id: user_id });
+        if (!user)return false;
+        return [
+            UserPermissions.ADMINISTRATRICE,
+            UserPermissions.ADMINISTRATEUR,
+        ].includes(user.permission)
+    }
+
+
+    async isTeacher(user_id: number): Promise<boolean>
+    {
+        const user = await this.server.database.users.getIfExists({ id: user_id });
+        if (!user)return false;
+        return [
+            UserPermissions.ADMINISTRATRICE,
+            UserPermissions.ADMINISTRATEUR,
+            UserPermissions.ENSEIGNANTE,
+            UserPermissions.ENSEIGNANT,
+        ].includes(user.permission)
     }
 
     /**

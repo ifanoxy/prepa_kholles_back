@@ -6,10 +6,10 @@ export default function (app: App): string
     app.app.post("/v1/user/auth", async (req: Request<{}, {}, UserAuthBody>, res) => {
         const errors = [];
 
-        if (!((req.body.token) || (req.body.first_name && req.body.last_name && req.body.password)))
+        if (!((req.body.token) || (req.body.identifiant && req.body.password)))
             errors.push({
-                field: "first_name & last_name & password |  token",
-                message: `first_name et last_name et password ou token sont requis.`
+                field: "identifiant & password | token",
+                message: `identifiant et password ou token sont requis.`
             })
 
         if (errors.length > 0) {
@@ -22,7 +22,7 @@ export default function (app: App): string
             valid_token = await app.getUserIdByToken(req.body.token);
         else
         {
-            const user = await app.server.database.users.getIfExists({ first_name: req.body.first_name, last_name: req.body.last_name });
+            const user = await app.server.database.users.getIfExists({ identifiant: req.body.identifiant?.toLowerCase() });
 
             if (!user || !await app.checkHashPassword(req.body.password as string, user.password))
             {
@@ -43,7 +43,6 @@ export default function (app: App): string
 
 interface UserAuthBody {
     token?: string,
-    first_name?: string,
-    last_name?: string,
+    identifiant?: string,
     password?: string,
 }

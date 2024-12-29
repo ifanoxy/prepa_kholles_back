@@ -20,11 +20,15 @@ interface UsersKeys
      */
     last_name: string;
     /**
+     * Longueur maximal 32
+     */
+    identifiant: string;
+    /**
      * Longueur maximal 128
      */
     password: string;
     group: number;
-    permissions: UserPermissions;
+    permission: UserPermissions;
 }
 
 export { UsersKeys, UsersPrimaryKeys };

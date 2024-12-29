@@ -12,5 +12,6 @@ export interface SujetsKeys
     author_id: number;
     matiere_id: number;
     chapitre_id?: number;
+    comment_count?: number;
     image: string;
 }

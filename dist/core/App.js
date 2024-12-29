@@ -33,6 +33,7 @@ const path_1 = __importDefault(require("path"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const cors_1 = __importDefault(require("cors"));
+const UserPermissions_1 = require("../types/UserPermissions");
 class App {
     constructor(server) {
         this.server = server;
@@ -54,6 +55,37 @@ class App {
         catch {
             return false;
         }
+    }
+    async isMod(user_id) {
+        const user = await this.server.database.users.getIfExists({ id: user_id });
+        if (!user)
+            return false;
+        return [
+            UserPermissions_1.UserPermissions.ADMINISTRATRICE,
+            UserPermissions_1.UserPermissions.ADMINISTRATEUR,
+            UserPermissions_1.UserPermissions.MODERATEUR,
+            UserPermissions_1.UserPermissions.MODERATRICE,
+        ].includes(user.permission);
+    }
+    async isAdmin(user_id) {
+        const user = await this.server.database.users.getIfExists({ id: user_id });
+        if (!user)
+            return false;
+        return [
+            UserPermissions_1.UserPermissions.ADMINISTRATRICE,
+            UserPermissions_1.UserPermissions.ADMINISTRATEUR,
+        ].includes(user.permission);
+    }
+    async isTeacher(user_id) {
+        const user = await this.server.database.users.getIfExists({ id: user_id });
+        if (!user)
+            return false;
+        return [
+            UserPermissions_1.UserPermissions.ADMINISTRATRICE,
+            UserPermissions_1.UserPermissions.ADMINISTRATEUR,
+            UserPermissions_1.UserPermissions.ENSEIGNANTE,
+            UserPermissions_1.UserPermissions.ENSEIGNANT,
+        ].includes(user.permission);
     }
     /**
      * Permet de récupérer le chemin de tous les fichiers d'un dossier récursivement

@@ -7,6 +7,9 @@ import * as fs from "fs";
 import {ChapitresKeys, ChapitresPrimaryKey} from "../../types/schemas/Chapitres";
 import {MatieresKeys, MatieresPrimaryKeys} from "../../types/schemas/Matieres";
 import {SujetsKeys, SujetsPrimaryKeys} from "../../types/schemas/Sujets";
+import {PermissionsKeys, PermissionsPrimaryKeys} from "../../types/schemas/Permissions";
+import {CommentsKeys, CommentsPrimaryKeys} from "../../types/schemas/Comments";
+import {KhollesPlanningKeys, KhollesPlanningPrimaryKeys} from "../../types/schemas/kholles_planning";
 
 export default class Database
 {
@@ -15,6 +18,9 @@ export default class Database
     public chapitres!: Manager<ChapitresPrimaryKey, ChapitresKeys>;
     public matieres!: Manager<MatieresPrimaryKeys, MatieresKeys>;
     public sujets!: Manager<SujetsPrimaryKeys, SujetsKeys>;
+    public permissions!: Manager<PermissionsPrimaryKeys, PermissionsKeys>;
+    public comments!: Manager<CommentsPrimaryKeys, CommentsKeys>;
+    public planning!: Manager<KhollesPlanningPrimaryKeys, KhollesPlanningKeys>;
 
     constructor(private readonly server: Server) {}
 
@@ -47,6 +53,9 @@ export default class Database
         this.chapitres = new Manager<ChapitresPrimaryKey, ChapitresKeys>(this, "chapitres");
         this.matieres = new Manager<MatieresPrimaryKeys, MatieresKeys>(this, "matieres");
         this.sujets = new Manager<SujetsPrimaryKeys, SujetsKeys>(this, "sujets");
+        this.permissions = new Manager<PermissionsPrimaryKeys, PermissionsKeys>(this, "permissions");
+        this.comments = new Manager<CommentsPrimaryKeys, CommentsKeys>(this, "commentaires");
+        this.planning = new Manager<KhollesPlanningPrimaryKeys, KhollesPlanningKeys>(this, "kholle_schedule");
     }
 
     /**

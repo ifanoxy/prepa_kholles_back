@@ -1,9 +1,36 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const lru_cache_1 = __importDefault(require("lru-cache"));
 class Manager {
-    constructor(database, tableName) {
+    constructor(database, tableName, cacheOptions = {}) {
         this.database = database;
         this.tableName = tableName;
+        this.cache = new lru_cache_1.default({
+            max: cacheOptions.maxSize || 1000,
+            ttl: cacheOptions.ttl || 10 * 60000,
+        });
+        this.cacheDependencies = new Map();
+    }
+    generateCacheKey(method, args) {
+        return `${method}:${this.tableName}:${JSON.stringify(args)}`;
+    }
+    trackDependency(key) {
+        if (!this.cacheDependencies.has(this.tableName)) {
+            this.cacheDependencies.set(this.tableName, new Set());
+        }
+        this.cacheDependencies.get(this.tableName).add(key);
+    }
+    invalidateDependencies() {
+        const dependencies = this.cacheDependencies.get(this.tableName);
+        if (dependencies) {
+            for (const key of dependencies) {
+                this.cache.delete(key);
+            }
+            this.cacheDependencies.delete(this.tableName);
+        }
     }
     /**
      * Transforme les objets nodeJS en string permettant une recherche sécurisé par requête SQL
@@ -12,7 +39,8 @@ class Manager {
      * @private
      */
     formatWhere(where) {
-        return Object.entries(where).map(([key, value]) => {
+        return Object.entries(where)
+            .map(([key, value]) => {
             if (typeof value === "string") {
                 return `\`${key}\`='${value.replace(/'/g, "''")}'`;
             }
@@ -22,7 +50,8 @@ class Manager {
             else {
                 return `\`${key}\` IS NULL`;
             }
-        }).join(" AND ");
+        })
+            .join(" AND ");
     }
     /**
      * Transforme les objets nodeJS en string permettant une recherche sécurisé par requête SQL
@@ -31,7 +60,8 @@ class Manager {
      * @private
      */
     formatSet(values) {
-        return Object.entries(values).map(([key, value]) => {
+        return Object.entries(values)
+            .map(([key, value]) => {
             if (typeof value === "string") {
                 return `\`${key}\`='${value.replace(/'/g, "''")}'`;
             }
@@ -41,7 +71,8 @@ class Manager {
             else {
                 return `\`${key}\`= NULL`;
             }
-        }).join(", ");
+        })
+            .join(", ");
     }
     /**
      * Transforme les objets nodeJS en string permettant une recherche sécurisé par requête SQL
@@ -50,7 +81,8 @@ class Manager {
      * @private
      */
     formatValues(values) {
-        return Object.entries(values).map(([key, value]) => {
+        return Object.entries(values)
+            .map(([key, value]) => {
             if (typeof value === "string") {
                 return `'${value.replace(/'/g, "''")}'`;
             }
@@ -58,9 +90,10 @@ class Manager {
                 return value;
             }
             else {
-                return 'NULL';
+                return "NULL";
             }
-        }).join(", ");
+        })
+            .join(", ");
     }
     /**
      * Obtenir une valeur de la base de donnée
@@ -69,7 +102,14 @@ class Manager {
      * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      */
     async get(where, includes = "*") {
-        return (await this.database.query(`SELECT ${includes === "*" ? "*" : ("`" + includes.join("\`,\`") + "`")} FROM ${this.tableName} WHERE ${this.formatWhere(where)} LIMIT 1`))[0];
+        const cacheKey = this.generateCacheKey("get", [where, includes]);
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+        const result = (await this.database.query(`SELECT ${includes === "*" ? "*" : "`" + includes.join("`,`") + "`"} FROM ${this.tableName} WHERE ${this.formatWhere(where)} LIMIT 1`))[0];
+        this.cache.set(cacheKey, result);
+        this.trackDependency(cacheKey);
+        return result;
     }
     /**
      * Obtenir une liste de valeurs de la base de donnée
@@ -79,14 +119,23 @@ class Manager {
      * @param {getAllOptions} options les options de la requête
      */
     async getAll(where, includes = "*", options = { offset: 0, limits: 100, orderBy: "" }) {
-        return (await this.database.query(`SELECT ${includes === "*" ? "*" : ("`" + includes.join("\`,\`") + "`")} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)}` : ""}${options.orderBy ? `ORDER BY ${options.orderBy}` : ''} LIMIT ${options.limits ?? 10} OFFSET ${options.offset ?? 0}`));
+        const cacheKey = this.generateCacheKey("getAll", [where, includes, options]);
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+        const result = (await this.database.query(`SELECT ${includes === "*" ? "*" : "`" + includes.join("`,`") + "`"} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)} ` : ""}${options.orderBy ? `ORDER BY ${options.orderBy}` : ""} LIMIT ${options.limits ?? 10} OFFSET ${options.offset ?? 0}`));
+        this.cache.set(cacheKey, result);
+        this.trackDependency(cacheKey);
+        return result;
     }
     /**
      * Permet d'ajouter des valeurs ou une liste de valeurs en base de donnée
      * @param {PrimaryKeys & Keys | (PrimaryKeys & Keys)[]} values
      */
     async insert(values) {
-        return (await this.database.query(`INSERT INTO ${this.tableName} (\`${Array.isArray(values) ? Object.keys(values[0]).join("\`, \`") : Object.keys(values).join("\`, \`")}\`) VALUES (${Array.isArray(values) ? values.map(x => this.formatValues(Object.values(x))).join("), (") : this.formatValues(Object.values(values))})`));
+        const result = await this.database.query(`INSERT INTO ${this.tableName} (\`${Array.isArray(values) ? Object.keys(values[0]).join("`, `") : Object.keys(values).join("`, `")}\`) VALUES (${Array.isArray(values) ? values.map(x => this.formatValues(Object.values(x))).join("), (") : this.formatValues(Object.values(values))})`);
+        this.invalidateDependencies();
+        return result;
     }
     /**
      * Permet d'ajouter des valeurs ou une liste de valeurs en base de donnée
@@ -94,21 +143,39 @@ class Manager {
      * @param {PrimaryKeys & Keys | (PrimaryKeys & Keys)[]} values
      */
     async update(where, values) {
-        return (await this.database.query(`UPDATE ${this.tableName} SET ${this.formatSet(values)} WHERE ${this.formatWhere(where)}`));
+        const result = await this.database.query(`UPDATE ${this.tableName} SET ${this.formatSet(values)} WHERE ${this.formatWhere(where)}`);
+        this.invalidateDependencies();
+        return result;
     }
     /**
      * Permet de supprimer des lignes en base de donnée
      * @param {PrimaryKeys & Partial<Keys>} where Les conditions d'identifications
      */
     async delete(where) {
-        return (await this.database.query(`DELETE FROM ${this.tableName} WHERE ${this.formatWhere(where)}`));
+        const result = await this.database.query(`DELETE FROM ${this.tableName} WHERE ${this.formatWhere(where)}`);
+        this.invalidateDependencies();
+        return result;
     }
     /**
      * Vérifie si une ligne est existante dans la base de donnée
      * @param {PrimaryKeys & Partial<Keys>} where
      */
     async has(where) {
-        return (await this.database.query(`SELECT COUNT(*) as count FROM ${this.tableName} WHERE ${this.formatWhere(where)}`))[0].count >= 1;
+        return (await this.size(where)) >= 1;
+    }
+    /**
+     * Renvoie le nombre de ligne en base de donnée
+     * @param {PrimaryKeys & Partial<Keys>} where
+     */
+    async size(where) {
+        const cacheKey = this.generateCacheKey("size", [where]);
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+        const result = (await this.database.query(`SELECT COUNT(*) as count FROM ${this.tableName} WHERE ${this.formatWhere(where)}`))[0];
+        this.cache.set(cacheKey, result.count);
+        this.trackDependency(cacheKey);
+        return result.count;
     }
     /**
      * Retourne une ligne si elle existe sinon renvoie null
