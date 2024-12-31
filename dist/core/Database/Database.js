@@ -54,6 +54,7 @@ class Database {
         this.permissions = new Manager_1.default(this, "permissions");
         this.comments = new Manager_1.default(this, "commentaires");
         this.planning = new Manager_1.default(this, "kholle_schedule");
+        this.demonstration = new Manager_1.default(this, "demonstration");
     }
     /**
      * Charger les tables de la base de donnée

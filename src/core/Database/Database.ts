@@ -10,6 +10,7 @@ import {SujetsKeys, SujetsPrimaryKeys} from "../../types/schemas/Sujets";
 import {PermissionsKeys, PermissionsPrimaryKeys} from "../../types/schemas/Permissions";
 import {CommentsKeys, CommentsPrimaryKeys} from "../../types/schemas/Comments";
 import {KhollesPlanningKeys, KhollesPlanningPrimaryKeys} from "../../types/schemas/kholles_planning";
+import {DemonstrationKeys, DemonstrationPrimaryKeys} from "../../types/schemas/Demonstration";
 
 export default class Database
 {
@@ -21,6 +22,7 @@ export default class Database
     public permissions!: Manager<PermissionsPrimaryKeys, PermissionsKeys>;
     public comments!: Manager<CommentsPrimaryKeys, CommentsKeys>;
     public planning!: Manager<KhollesPlanningPrimaryKeys, KhollesPlanningKeys>;
+    public demonstration!: Manager<DemonstrationPrimaryKeys, DemonstrationKeys>;
 
     constructor(private readonly server: Server) {}
 
@@ -55,6 +57,7 @@ export default class Database
         this.permissions = new Manager<PermissionsPrimaryKeys, PermissionsKeys>(this, "permissions");
         this.comments = new Manager<CommentsPrimaryKeys, CommentsKeys>(this, "commentaires");
         this.planning = new Manager<KhollesPlanningPrimaryKeys, KhollesPlanningKeys>(this, "kholle_schedule");
+        this.demonstration = new Manager<DemonstrationPrimaryKeys, DemonstrationKeys>(this, "demonstration");
     }
 
     /**
