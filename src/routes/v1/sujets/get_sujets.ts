@@ -23,7 +23,7 @@ export default function (app: App): string
         const cachedSujetIds = Array.from(app.server.database.cache.keys());
         const sujetIdsNotCached = sujetIds.map(x => x.id).filter(x => !cachedSujetIds.includes(x) ) ;
 
-        const sujets = await app.server.database.query(`SELECT \`image\`, \`author_id\`, \`comment_count\`, \`chapitre_id\`, \`matiere_id\`, \`id\` FROM \`sujets\` WHERE ${sujetIdsNotCached.map(x => `id=${x}`).join(' OR ')} LIMIT ${params.limit} OFFSET ${params.offset}`) as (SujetsPrimaryKeys & SujetsKeys)[]
+        const sujets = sujetIdsNotCached.length === 0 ? await app.server.database.query(`SELECT \`image\`, \`author_id\`, \`comment_count\`, \`chapitre_id\`, \`matiere_id\`, \`id\` FROM \`sujets\` WHERE ${sujetIdsNotCached.map(x => `id=${x}`).join(' OR ')} LIMIT ${params.limit} OFFSET ${params.offset}`) as (SujetsPrimaryKeys & SujetsKeys)[] : []
 
         const sujetsData = (await Promise.all(sujets.map(async sujet => {
             const author = await app.server.database.users.getIfExists({ id: sujet.author_id }, ['first_name', 'last_name', 'identifiant']);
