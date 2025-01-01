@@ -11,7 +11,6 @@ class Config {
     }
     loadConfig() {
         this.data = require(process.cwd() + "/config.json");
-        console.log(this.data);
     }
     get(key) {
         if (!this.data)

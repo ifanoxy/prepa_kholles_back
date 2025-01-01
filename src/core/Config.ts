@@ -8,7 +8,6 @@ export class Config {
 
     private loadConfig() {
         this.data = require(process.cwd() + "/config.json");
-        console.log(this.data)
     }
 
     public get<T extends keyof IConfig>(key: T): IConfig[T] {
