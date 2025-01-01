@@ -33,8 +33,44 @@ export default function (app: App): string
             image: req.body.image,
             chapitre_id: req.body.chapitre_id ? req.body.chapitre_id : null
         });
-
         res.status(200).json({ message: `Successfully created` });
+
+        if (app.server.discord)
+        {
+            const channel_id = app.server.config.get("sujet_channel_id");
+
+            const userData = await app.server.database.users.get({ id: user_id }, ["identifiant"]);
+            const matiere = await app.server.database.matieres.get({ id: req.body.matiere_id }, ["name"]);
+            const chapitre = req.body.chapitre_id ? await app.server.database.chapitres.get({ id: req.body.chapitre_id }, ["name"]) : null;
+
+            const sfbuff = Buffer.from((req.body.image as string).split(",")[1], "base64");
+
+            await app.server.discord.createMessage(
+                channel_id,
+                {
+                    content: `<@&${app.server.config.get('roles')[matiere.name as 'Mathématiques']}> Nouveau sujet de Khôlles disponible !`,
+                    embeds: [
+                        {
+                            url: 'https://mp2i-roosevelt.fr/',
+                            title: `Sujet Khôlles ${matiere.name}`,
+                            description: chapitre ? `${chapitre.name}` : "",
+                            color: Number.parseInt("c54f4f", 16),
+                            image: {
+                                url: "attachment://sujet.png",
+                            },
+                            footer: {
+                                text: `Publié par ${userData.identifiant}`,
+                            },
+                            timestamp: new Date(),
+                        }
+                    ]
+                },
+                {
+                    file: sfbuff,
+                    name: 'sujet.png'
+                }
+            );
+        }
     });
 
     return "POST v1/sujets/create";

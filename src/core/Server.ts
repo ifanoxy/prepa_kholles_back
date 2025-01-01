@@ -1,16 +1,21 @@
 import Database from "./Database/Database";
 import Logger from "./Logger";
 import {App} from "./App";
-import {UserPermissions} from "../types/UserPermissions";
+import {DiscordClient} from "./Discord";
+import {Config} from "./Config";
 
 export default class Server {
     public database: Database;
     public log: Logger;
     public app: App;
+    public discord: DiscordClient | null;
+    public config: Config;
 
     constructor() {
         this.database = new Database(this);
         this.log = new Logger();
+        this.config = new Config();
+        this.discord = process.env.DISCORD_TOKEN ? new DiscordClient(this) : null;
         this.app = new App(this);
     }
 
@@ -21,6 +26,9 @@ export default class Server {
         await this.database.loadTables();
         await this.database.loadManagers();
 
-        this.app.init();
+        if (this.discord)
+            await this.discord.init();
+
+        await this.app.init();
     }
 }
