@@ -9,8 +9,15 @@ function default_1(app) {
             res.status(401).send("Unauthorized");
             return;
         }
-        const sujets = await app.server.database.sujets.getAll(undefined, ['image', 'author_id', 'comment_count', 'chapitre_id', 'matiere_id', 'id'], { limits: 25, orderBy: "id DESC" });
-        const sujetsData = await Promise.all(sujets.map(async (sujet) => {
+        const params = {
+            limit: req.query?.limit ? (Number(req.query.limit) <= 50 ? Number(req.query.limit) : 25) : 25,
+            offset: req.query?.offset ? Number(req.query?.offset) : 0,
+        };
+        const sujetIds = await app.server.database.sujets.getAll(undefined, ['id'], { limits: params.limit, offset: params.offset, orderBy: "id DESC" });
+        const cachedSujetIds = Array.from(app.server.database.cache.keys());
+        const sujetIdsNotCached = sujetIds.map(x => x.id).filter(x => !cachedSujetIds.includes(x));
+        const sujets = await app.server.database.query(`SELECT \`image\`, \`author_id\`, \`comment_count\`, \`chapitre_id\`, \`matiere_id\`, \`id\` FROM \`sujets\` WHERE ${sujetIdsNotCached.map(x => `id=${x}`).join(' OR ')} LIMIT ${params.limit} OFFSET ${params.offset}`);
+        const sujetsData = (await Promise.all(sujets.map(async (sujet) => {
             const author = await app.server.database.users.getIfExists({ id: sujet.author_id }, ['first_name', 'last_name', 'identifiant']);
             const matiere = await app.server.database.matieres.getIfExists({ id: sujet.matiere_id });
             const chapitre = sujet.chapitre_id ? await app.server.database.chapitres.get({ id: sujet.chapitre_id }) : null;
@@ -24,15 +31,22 @@ function default_1(app) {
                     comment_count: sujet.comment_count,
                     id: sujet.id,
                     author: author,
+                    author_id: sujet.author_id,
+                    matiere_id: sujet.matiere_id,
                     chapitre: chapitre,
                     matiere: matiere
                 };
             }
             catch {
-                return null;
+                return undefined;
             }
-        }));
-        res.status(200).json({ data: sujetsData });
+        }))).filter(x => x);
+        sujetsData.forEach(x => {
+            if (!x)
+                return;
+            app.server.database.cache.set(x.id, x);
+        });
+        res.status(200).json({ data: [...app.server.database.cache.values(), ...sujetsData] });
     });
     return "GET v1/sujets";
 }

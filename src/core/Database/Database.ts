@@ -4,6 +4,7 @@ import {Connection} from "mysql2/promise";
 import Manager from "./Manager";
 import {UsersKeys, UsersPrimaryKeys} from "../../types/schemas/Users";
 import * as fs from "fs";
+import LRUCache from "lru-cache";
 import {ChapitresKeys, ChapitresPrimaryKey} from "../../types/schemas/Chapitres";
 import {MatieresKeys, MatieresPrimaryKeys} from "../../types/schemas/Matieres";
 import {SujetsKeys, SujetsPrimaryKeys} from "../../types/schemas/Sujets";
@@ -23,8 +24,14 @@ export default class Database
     public comments!: Manager<CommentsPrimaryKeys, CommentsKeys>;
     public planning!: Manager<KhollesPlanningPrimaryKeys, KhollesPlanningKeys>;
     public demonstration!: Manager<DemonstrationPrimaryKeys, DemonstrationKeys>;
+    public cache: LRUCache<number, SujetsPrimaryKeys & SujetsKeys> ;
 
-    constructor(private readonly server: Server) {}
+    constructor(private readonly server: Server) {
+        this.cache = new LRUCache({
+            max: 1000,
+            ttl: 10 * 60000,
+        });
+    }
 
     /**
      * Permet de créer une connection avec la base de donnée

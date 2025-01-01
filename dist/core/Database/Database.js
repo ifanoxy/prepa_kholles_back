@@ -29,9 +29,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const promise_1 = require("mysql2/promise");
 const Manager_1 = __importDefault(require("./Manager"));
 const fs = __importStar(require("fs"));
+const lru_cache_1 = __importDefault(require("lru-cache"));
 class Database {
     constructor(server) {
         this.server = server;
+        this.cache = new lru_cache_1.default({
+            max: 1000,
+            ttl: 10 * 60000,
+        });
     }
     /**
      * Permet de créer une connection avec la base de donnée
