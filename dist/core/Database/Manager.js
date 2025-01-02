@@ -161,7 +161,14 @@ class Manager {
      * @param {PrimaryKeys & Partial<Keys>} where
      */
     async has(where) {
-        return (await this.size(where)) >= 1;
+        const cacheKey = this.generateCacheKey("has", [where]);
+        const has = (await this.size(where)) >= 1;
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+        this.cache.set(cacheKey, has);
+        this.trackDependency(cacheKey);
+        return has;
     }
     /**
      * Renvoie le nombre de ligne en base de donnée
