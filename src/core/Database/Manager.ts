@@ -182,7 +182,14 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      * @param {PrimaryKeys & Partial<Keys>} where
      */
     public async has(where: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>): Promise<boolean> {
-        return (await this.size(where)) >= 1;
+        const cacheKey = this.generateCacheKey("size", [where]);
+        const has = (await this.size(where)) >= 1;
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey) as boolean;
+        }
+        this.cache.set(cacheKey, has);
+        this.trackDependency(cacheKey);
+        return has;
     }
 
 
