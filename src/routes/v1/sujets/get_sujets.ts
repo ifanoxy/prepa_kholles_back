@@ -49,12 +49,13 @@ export default function (app: App): string
             }
         }))).filter(x => x);
 
+
+        res.status(200).json({ data: [...app.server.database.cache.values(), ...sujetsData] });
+
         sujetsData.forEach(x => {
             if (!x)return;
             app.server.database.cache.set(x.id, x)
         });
-
-        res.status(200).json({ data: [...app.server.database.cache.values(), ...sujetsData] });
     });
 
     return "GET v1/sujets";
