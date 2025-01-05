@@ -15,11 +15,11 @@ export default function (app: App): string
         if (req.query.identifiant)
             user = await app.server.database.users.getIfExists({
                 identifiant: req.query.identifiant as string
-            }, ["first_name", "last_name", "group", "permission", 'identifiant', 'id']);
+            }, ["first_name", "last_name", "group", "permission", 'identifiant', 'id',  'class', 'phone_number']);
         else {
             user = await app.server.database.users.getIfExists({
                 id: await app.getUserIdByToken(req.headers.authorization!.split(" ")[1]) as number
-            }, ["first_name", "last_name", "group", "permission", 'identifiant', 'id']);
+            }, ["first_name", "last_name", "group", "permission", 'identifiant', 'id',  'class', 'phone_number']);
         }
 
         if (!user){

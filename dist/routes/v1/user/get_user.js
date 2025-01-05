@@ -12,11 +12,11 @@ function default_1(app) {
         if (req.query?.identifiant)
             user = await app.server.database.users.getIfExists({
                 identifiant: req.query.identifiant
-            }, ["first_name", "last_name", "group", "permission", 'identifiant']);
+            }, ["first_name", "last_name", "group", "permission", 'identifiant', 'class', 'phone_number']);
         else {
             user = await app.server.database.users.getIfExists({
                 id: await app.getUserIdByToken(req.headers.authorization.split(" ")[1])
-            }, ["first_name", "last_name", "group", "permission", 'identifiant']);
+            }, ["first_name", "last_name", "group", "permission", 'identifiant', 'class', 'phone_number']);
         }
         if (!user) {
             res.status(400).send({ data: null });

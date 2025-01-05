@@ -10,15 +10,21 @@ function default_1(app) {
             return;
         }
         const users = await app.server.database.users.getAll(undefined, ["first_name", "last_name", "group", 'id', 'identifiant', 'permission']);
-        res.status(200).json({ data: await Promise.all(users.map(async (x) => ({
+        const data = [];
+        for (const x of users) {
+            const permission = await app.server.database.permissions.get({ id: x.permission });
+            const sujetSended = await app.server.database.sujets.size({ author_id: x.id });
+            const commentSended = await app.server.database.comments.size({ author_id: x.id });
+            data.push({
                 ...x,
-                permission: await app.server.database.permissions.get({ id: x.permission }),
+                permission: permission,
                 stats: {
-                    sujet_sended: await app.server.database.sujets.size({ author_id: x.id }),
-                    comment_sended: await app.server.database.comments.size({ author_id: x.id }),
-                }
-            })))
-        });
+                    sujet_sended: sujetSended,
+                    comment_sended: commentSended,
+                },
+            });
+        }
+        res.status(200).json({ data });
     });
     return "GET v1/users";
 }

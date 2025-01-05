@@ -29,6 +29,14 @@ interface UsersKeys
     password: string;
     group: number;
     permission: UserPermissions;
+    /**
+     * Longueur maximal 32
+     */
+    class?: string;
+    /**
+     * Longueur maximal 15
+     */
+    phone_number?: string;
 }
 
 export { UsersKeys, UsersPrimaryKeys };

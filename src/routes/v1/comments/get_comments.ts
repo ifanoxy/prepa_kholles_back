@@ -1,5 +1,6 @@
 import {App} from "../../../core/App";
 import {Request} from "express"
+import {UsersKeys, UsersPrimaryKeys} from "../../../types/schemas/Users";
 
 export default function (app: App): string
 {
@@ -15,7 +16,15 @@ export default function (app: App): string
 
         const user_ids = [...new Set(comments.map(x => x.author_id))];
 
-        const users = await Promise.all(user_ids.map(async x => app.server.database.users.getIfExists({ id: x }, ["identifiant", "last_name", "first_name", "id"])))
+        const users: (UsersKeys & UsersPrimaryKeys)[] = [];
+        for (const x of user_ids) {
+            const user = await app.server.database.users.getIfExists(
+                { id: x },
+                ["identifiant", "last_name", "first_name", "id"]
+            );
+            if (user)
+                users.push(user);
+        }
 
         res.status(200).json({ data: comments.map(x => ({...x, author: users.find(y => y!.id === x.author_id) })) });
     });

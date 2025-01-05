@@ -7,3 +7,9 @@ require("dotenv/config");
 require("./types/declare/main");
 const Server_1 = __importDefault(require("./core/Server"));
 new Server_1.default().init();
+process.on("unhandledRejection", (reason, promise) => {
+    console.error("Unhandled Rejection at:", promise, "reason:", reason);
+});
+process.on("uncaughtException", (error) => {
+    console.error("Uncaught Exception thrown", error);
+});

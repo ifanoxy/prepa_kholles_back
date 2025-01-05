@@ -24,31 +24,36 @@ export default function (app: App): string
         const sujetIdsNotCached = sujetIds.map(x => x.id).filter(x => !cachedSujetIds.includes(x));
         const sujets = sujetIdsNotCached.length === 0 ? [] : await app.server.database.query(`SELECT \`image\`, \`author_id\`, \`comment_count\`, \`chapitre_id\`, \`matiere_id\`, \`id\` FROM \`sujets\` ${' WHERE ' + sujetIdsNotCached.map(x => `id=${x}`).join(' OR ')} LIMIT ${params.limit} OFFSET ${params.offset}`) as (SujetsPrimaryKeys & SujetsKeys)[]
 
-        const sujetsData = (await Promise.all(sujets.map(async sujet => {
-            const author = await app.server.database.users.getIfExists({ id: sujet.author_id }, ['first_name', 'last_name', 'identifiant']);
+        const sujetsData = [];
+        for (const sujet of sujets) {
+            const author = await app.server.database.users.getIfExists(
+                { id: sujet.author_id },
+                ['first_name', 'last_name', 'identifiant']
+            );
             const matiere = await app.server.database.matieres.getIfExists({ id: sujet.matiere_id });
             const chapitre = sujet.chapitre_id ? await app.server.database.chapitres.get({ id: sujet.chapitre_id }) : null;
 
             try {
-                return {
-                    image: await compressImage(sujet.image.toString(), {
-                        quality: 75,
-                        maxWidth: 800,
-                        maxHeight: 800,
-                    }).catch(() => null) as string,
+                const image = await compressImage(sujet.image.toString(), {
+                    quality: 75,
+                    maxWidth: 800,
+                    maxHeight: 800,
+                }).catch(() => null) as string;
+
+                sujetsData.push({
+                    image,
                     comment_count: sujet.comment_count,
                     id: sujet.id,
                     author: author,
                     author_id: sujet.author_id,
                     matiere_id: sujet.matiere_id,
                     chapitre: chapitre,
-                    matiere: matiere
-                }
+                    matiere: matiere,
+                });
             } catch {
-                return undefined;
-            }
-        }))).filter(x => x);
 
+            }
+        }
 
         res.status(200).json({ data: [...app.server.database.cache.values(), ...sujetsData] });
 
