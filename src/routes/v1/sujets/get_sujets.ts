@@ -55,7 +55,7 @@ export default function (app: App): string
             }
         }
 
-        res.status(200).json({ data: [...app.server.database.cache.values(), ...sujetsData] });
+        res.status(200).json({ data: [...app.server.database.cache.values(), ...sujetsData].sort((a, b) => b.id - a.id) });
 
         sujetsData.forEach(x => {
             if (!x)return;
