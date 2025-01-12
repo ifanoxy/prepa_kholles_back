@@ -143,31 +143,6 @@ export default class Logger
     {
         if (tag >= this.level)
             console.log(Logger.format_time, LoggerTag[LoggerLevel[tag as unknown as keyof typeof LoggerLevel] as unknown as keyof typeof LoggerTag], ":", message);
-
-        const date = new Date();
-
-        const
-            dirname = date.toLocaleDateString("fr", { dateStyle: "long" }).split(" ")[1],
-            filename = date.toLocaleDateString("fr", { dateStyle: "medium" }) + ".csv";
-
-        if (!fs.existsSync(`./logs`))
-            fs.mkdirSync(`./logs`);
-
-        if (!fs.existsSync(`./logs/${dirname}`))
-            fs.mkdirSync(`./logs/${dirname}`);
-
-        if (!fs.existsSync(`./logs/${dirname}/${filename}`))
-            fs.writeFileSync(`./logs/${dirname}/${filename}`, "date;time;level;message\n", { encoding: "utf-8"});
-
-        fs.appendFileSync(
-            `./logs/${dirname}/${filename}`,
-            [
-                `${date.getDay().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear().toString().padStart(2, "0")}`,
-                `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}.${date.getMilliseconds().toString().padStart(2, "0")}`,
-                LoggerLevel[tag],
-                JSON.stringify(message)
-            ].join(";") + "\n"
-        );
     }
 }
 
