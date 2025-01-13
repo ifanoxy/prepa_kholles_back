@@ -50,6 +50,11 @@ export default class Database
             throw new Error("Identifiants de connexion à la base de donnée manquants");
 
         this.connection = await createConnection({ host, port, user, password, database });
+
+        this.connection?.on('error', async (err) => {
+            this.server.log.error(err);
+            this.connection = await createConnection({ host, port, user, password, database });
+        })
     }
 
     /**

@@ -47,6 +47,10 @@ class Database {
         if (!host || Number.isNaN(port) || !user || !password || !database)
             throw new Error("Identifiants de connexion à la base de donnée manquants");
         this.connection = await (0, promise_1.createConnection)({ host, port, user, password, database });
+        this.connection?.on('error', async (err) => {
+            this.server.log.error(err);
+            this.connection = await (0, promise_1.createConnection)({ host, port, user, password, database });
+        });
     }
     /**
      * Charger les managers de la base de donnée
