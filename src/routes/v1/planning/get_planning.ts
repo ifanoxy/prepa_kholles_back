@@ -12,7 +12,7 @@ export default function (app: App): string
             return;
         }
 
-        const planning = await app.server.database.planning.getAll(undefined, '*', {limits: 1000});
+        const planning = await app.server.database.planning.getAll(undefined, '*', {limits: 1000, beforeId: null});
 
         res.status(200).json({ data: planning });
     });

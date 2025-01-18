@@ -8,7 +8,7 @@ function default_1(app) {
             res.status(401).send("Unauthorized");
             return;
         }
-        const comments = await app.server.database.comments.getAll({ sujet_id: Number(req.params.sujet_id) }, ['content', 'author_id', 'id', 'created_time'], { limits: 50, orderBy: "id DESC" });
+        const comments = await app.server.database.comments.getAll({ sujet_id: Number(req.params.sujet_id) }, ['content', 'author_id', 'id', 'created_time'], { limits: 50, orderBy: "id DESC", beforeId: null });
         const user_ids = [...new Set(comments.map(x => x.author_id))];
         const users = [];
         for (const x of user_ids) {

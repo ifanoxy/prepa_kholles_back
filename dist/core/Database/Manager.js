@@ -118,7 +118,7 @@ class Manager {
      * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      * @param {getAllOptions} options les options de la requête
      */
-    async getAll(where, includes = "*", options = { offset: 0, limits: 100, orderBy: "" }) {
+    async getAll(where, includes = "*", options = { offset: 0, limits: 100, orderBy: "", beforeId: null }) {
         const cacheKey = this.generateCacheKey("getAll", [where, includes, options]);
         if (this.cache.has(cacheKey)) {
             return this.cache.get(cacheKey);

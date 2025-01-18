@@ -12,7 +12,7 @@ export default function (app: App): string
             return;
         }
 
-        const comments = await app.server.database.comments.getAll({ sujet_id: Number(req.params.sujet_id) }, ['content', 'author_id', 'id', 'created_time'], { limits: 50, orderBy: "id DESC" });
+        const comments = await app.server.database.comments.getAll({ sujet_id: Number(req.params.sujet_id) }, ['content', 'author_id', 'id', 'created_time'], { limits: 50, orderBy: "id DESC", beforeId: null });
 
         const user_ids = [...new Set(comments.map(x => x.author_id))];
 
