@@ -243,6 +243,6 @@ interface getAllOptions {
      * Default: 100
      */
     limits?: number;
-    beforeId: number | null;
+    beforeId?: number | null;
     orderBy?: string;
 }

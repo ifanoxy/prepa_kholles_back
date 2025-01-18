@@ -10,7 +10,7 @@ function default_1(app) {
             return;
         }
         const params = {
-            before_id: typeof req.query?.before_id == "number" ? Number(req.query.before_id) : null,
+            before_id: !Number.isNaN(Number(req.query?.before_id)) ? Number(req.query.before_id) : null,
             matiere_id: req.query?.matiere_id ? Number(req.query.matiere_id) : null,
             limit: req.query?.limit ? (Number(req.query.limit) <= 50 ? Number(req.query.limit) : 20) : 20,
             offset: req.query?.offset ? Number(req.query?.offset) : 0,

@@ -19,7 +19,16 @@ export default function (app: App): string
 
         let valid_token;
         if (req.body.token)
+        {
             valid_token = await app.getUserIdByToken(req.body.token);
+            if (valid_token)
+            {
+                await app.server.database.users.get({ id: valid_token })
+                    .then(user =>
+                        app.server.log.info(`Nouvelle connexion de ${user.identifiant}`)
+                    );
+            }
+        }
         else
         {
             const user = await app.server.database.users.getIfExists({ identifiant: req.body.identifiant?.toLowerCase() });
@@ -32,9 +41,10 @@ export default function (app: App): string
                 return;
             }
 
+            app.server.log.info(`Nouvelle connexion de ${user.identifiant}`);
+
             valid_token = app.generateAPIToken(user.id, user.password);
         }
-
         res.status(200).json({ [req.body.token ? 'user_id' : 'token']: valid_token });
     });
 
