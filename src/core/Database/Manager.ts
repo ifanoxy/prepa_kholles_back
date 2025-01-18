@@ -129,7 +129,7 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      * @param {getAllOptions} options les options de la requête
      */
-    public async getAll(where?: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> | "*" = "*", options: getAllOptions = { offset: 0, limits: 100, orderBy: "" }): Promise<(PrimaryKeys & Keys)[]> {
+    public async getAll(where?: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> | "*" = "*", options: getAllOptions = { offset: 0, limits: 100, orderBy: "", beforeId: null }): Promise<(PrimaryKeys & Keys)[]> {
         const cacheKey = this.generateCacheKey("getAll", [where, includes, options]);
         if (this.cache.has(cacheKey)) {
             return this.cache.get(cacheKey) as (PrimaryKeys & Keys)[];
@@ -242,6 +242,6 @@ interface getAllOptions {
      * Default: 100
      */
     limits?: number;
-    beforeId?: number | null;
+    beforeId: number | null;
     orderBy?: string;
 }
