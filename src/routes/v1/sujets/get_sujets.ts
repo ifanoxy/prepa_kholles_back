@@ -14,7 +14,7 @@ export default function (app: App): string
         }
 
         const params = {
-            before_id: req.query?.before_id ? Number(req.query.before_id) : null,
+            before_id: req.query?.before_id !== null ? Number(req.query.before_id) : null,
             matiere_id: req.query?.matiere_id ? Number(req.query.matiere_id) : null,
             limit: req.query?.limit ? (Number(req.query.limit) <= 50 ? Number(req.query.limit) : 20) : 20,
             offset: req.query?.offset ? Number(req.query?.offset) : 0,
