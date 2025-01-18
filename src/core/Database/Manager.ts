@@ -135,7 +135,7 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
             return this.cache.get(cacheKey) as (PrimaryKeys & Keys)[];
         }
 
-        const result = (await this.database.query(`SELECT ${includes === "*" ? "*" : "`" + includes.join("`,`") + "`"} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)} ` : ""}${options.orderBy ? `ORDER BY ${options.orderBy}` : ""} LIMIT ${options.limits ?? 10} OFFSET ${options.offset ?? 0}`)) as unknown as (PrimaryKeys & Keys)[];
+        const result = (await this.database.query(`SELECT ${includes === "*" ? "*" : "`" + includes.join("`,`") + "`"} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)} ${(options.beforeId ? `AND id <= ${options.beforeId} ` : '')}` : (options.beforeId ? `WHERE id <= ${options.beforeId} ` : '')}${options.orderBy ? `ORDER BY ${options.orderBy}` : ""} LIMIT ${options.limits ?? 10} OFFSET ${options.offset ?? 0}`)) as unknown as (PrimaryKeys & Keys)[];
 
         this.cache.set(cacheKey, result);
         this.trackDependency(cacheKey);
@@ -197,13 +197,13 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      * Renvoie le nombre de ligne en base de donnée
      * @param {PrimaryKeys & Partial<Keys>} where
      */
-    public async size(where: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>): Promise<number> {
+    public async size(where?: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>): Promise<number> {
         const cacheKey = this.generateCacheKey("size", [where]);
         if (this.cache.has(cacheKey)) {
             return this.cache.get(cacheKey) as number;
         }
 
-        const result = (await this.database.query(`SELECT COUNT(*) as count FROM ${this.tableName} WHERE ${this.formatWhere(where)}`))[0] as { count: number };
+        const result = (await this.database.query(`SELECT COUNT(*) as count FROM ${this.tableName} ${where ? ` WHERE ${this.formatWhere(where)}` : ""}`))[0] as { count: number };
         this.cache.set(cacheKey, result.count);
         this.trackDependency(cacheKey);
         return result.count;
@@ -242,5 +242,6 @@ interface getAllOptions {
      * Default: 100
      */
     limits?: number;
+    beforeId?: number | null;
     orderBy?: string;
 }

@@ -44,7 +44,6 @@ export default class Database
             user = process.env.API_DATABASE_USER,
             password = process.env.API_DATABASE_PASSWORD,
             database = process.env.API_DATABASE_NAME;
-
         // Vérification de la présence des identifiants de connection
         if (!host || Number.isNaN(port) || !user || !password || !database)
             throw new Error("Identifiants de connexion à la base de donnée manquants");

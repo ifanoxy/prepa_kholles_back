@@ -123,7 +123,7 @@ class Manager {
         if (this.cache.has(cacheKey)) {
             return this.cache.get(cacheKey);
         }
-        const result = (await this.database.query(`SELECT ${includes === "*" ? "*" : "`" + includes.join("`,`") + "`"} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)} ` : ""}${options.orderBy ? `ORDER BY ${options.orderBy}` : ""} LIMIT ${options.limits ?? 10} OFFSET ${options.offset ?? 0}`));
+        const result = (await this.database.query(`SELECT ${includes === "*" ? "*" : "`" + includes.join("`,`") + "`"} FROM ${this.tableName} ${where ? `WHERE ${this.formatWhere(where)} ${(options.beforeId ? `AND id <= ${options.beforeId} ` : '')}` : (options.beforeId ? `WHERE id <= ${options.beforeId} ` : '')}${options.orderBy ? `ORDER BY ${options.orderBy}` : ""} LIMIT ${options.limits ?? 10} OFFSET ${options.offset ?? 0}`));
         this.cache.set(cacheKey, result);
         this.trackDependency(cacheKey);
         return result;
@@ -179,7 +179,7 @@ class Manager {
         if (this.cache.has(cacheKey)) {
             return this.cache.get(cacheKey);
         }
-        const result = (await this.database.query(`SELECT COUNT(*) as count FROM ${this.tableName} WHERE ${this.formatWhere(where)}`))[0];
+        const result = (await this.database.query(`SELECT COUNT(*) as count FROM ${this.tableName} ${where ? ` WHERE ${this.formatWhere(where)}` : ""}`))[0];
         this.cache.set(cacheKey, result.count);
         this.trackDependency(cacheKey);
         return result.count;

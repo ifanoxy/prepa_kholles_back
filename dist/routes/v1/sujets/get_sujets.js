@@ -10,10 +10,12 @@ function default_1(app) {
             return;
         }
         const params = {
-            limit: req.query?.limit ? (Number(req.query.limit) <= 50 ? Number(req.query.limit) : 25) : 25,
+            before_id: req.query?.before_id ? Number(req.query.before_id) : null,
+            matiere_id: req.query?.matiere_id ? Number(req.query.matiere_id) : null,
+            limit: req.query?.limit ? (Number(req.query.limit) <= 50 ? Number(req.query.limit) : 20) : 20,
             offset: req.query?.offset ? Number(req.query?.offset) : 0,
         };
-        const sujetIds = await app.server.database.sujets.getAll(undefined, ['id'], { limits: params.limit, offset: params.offset, orderBy: "id DESC" });
+        const sujetIds = await app.server.database.sujets.getAll(params.matiere_id ? { matiere_id: params.matiere_id } : undefined, ['id'], { limits: params.limit, offset: params.offset, orderBy: "id DESC", beforeId: params.before_id });
         const cachedSujetIds = Array.from(app.server.database.cache.keys());
         const sujetIdsNotCached = sujetIds.map(x => x.id).filter(x => !cachedSujetIds.includes(x));
         const sujets = sujetIdsNotCached.length === 0 ? [] : await app.server.database.query(`SELECT \`image\`, \`author_id\`, \`comment_count\`, \`chapitre_id\`, \`matiere_id\`, \`id\` FROM \`sujets\` ${' WHERE ' + sujetIdsNotCached.map(x => `id=${x}`).join(' OR ')} LIMIT ${params.limit} OFFSET ${params.offset}`);
@@ -42,7 +44,9 @@ function default_1(app) {
             catch {
             }
         }
-        res.status(200).json({ data: [...app.server.database.cache.values(), ...sujetsData].sort((a, b) => b.id - a.id) });
+        const ids = sujetIds.map(x => x.id);
+        const filtered_sujets = [...[...app.server.database.cache.values()].filter(x => ids.includes(x.id)), ...sujetsData].sort((a, b) => b.id - a.id);
+        res.status(200).json({ data: filtered_sujets, sujets_count: await app.server.database.sujets.size() });
         sujetsData.forEach(x => {
             if (!x)
                 return;
