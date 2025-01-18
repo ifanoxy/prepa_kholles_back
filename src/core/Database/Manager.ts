@@ -130,6 +130,7 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      * @param {getAllOptions} options les options de la requête
      */
     public async getAll(where?: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> | "*" = "*", options: getAllOptions = { offset: 0, limits: 100, orderBy: "", beforeId: null }): Promise<(PrimaryKeys & Keys)[]> {
+        options.beforeId = typeof options.beforeId == "number" ? options.beforeId : null;
         const cacheKey = this.generateCacheKey("getAll", [where, includes, options]);
         if (this.cache.has(cacheKey)) {
             return this.cache.get(cacheKey) as (PrimaryKeys & Keys)[];
