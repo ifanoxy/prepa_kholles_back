@@ -32,8 +32,9 @@ function default_1(app) {
             const matiere = await app.server.database.matieres.get({ id: req.body.matiere_id }, ["name"]);
             const chapitre = req.body.chapitre_id ? await app.server.database.chapitres.get({ id: req.body.chapitre_id }, ["name"]) : null;
             const sfbuff = Buffer.from(req.body.image.split(",")[1], "base64");
+            const role_id = app.server.config.get('roles')[matiere.name];
             await app.server.discord.createMessage(channel_id, {
-                content: `<@&${app.server.config.get('roles')[matiere.name]}> Nouveau sujet de Khôlles disponible !`,
+                content: `${role_id ? `<@&${role_id}> ` : ''}Nouveau sujet de Khôlles disponible !`,
                 embeds: [
                     {
                         url: 'https://mp2i-roosevelt.fr/',

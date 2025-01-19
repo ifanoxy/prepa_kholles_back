@@ -45,10 +45,12 @@ export default function (app: App): string
 
             const sfbuff = Buffer.from((req.body.image as string).split(",")[1], "base64");
 
+            const role_id = app.server.config.get('roles')[matiere.name as 'Mathématiques'];
+
             await app.server.discord.createMessage(
                 channel_id,
                 {
-                    content: `<@&${app.server.config.get('roles')[matiere.name as 'Mathématiques']}> Nouveau sujet de Khôlles disponible !`,
+                    content: `${role_id ? `<@&${role_id}> ` : ''}Nouveau sujet de Khôlles disponible !`,
                     embeds: [
                         {
                             url: 'https://mp2i-roosevelt.fr/',
