@@ -9,7 +9,7 @@ function default_1(app) {
             return;
         }
         const demosData = await app.server.database.demonstration.getAll();
-        res.status(200).json({ data: demosData.map(x => ({ ...x, pdf: x.pdf.toString() })) });
+        res.status(200).json({ data: demosData.map(x => ({ ...x, pdf: x?.pdf?.toString() ?? null })) });
     });
-    return "GET v1/sujets";
+    return "GET v1/demonstrations";
 }

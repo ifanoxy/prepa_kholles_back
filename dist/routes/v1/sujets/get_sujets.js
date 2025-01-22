@@ -41,8 +41,7 @@ function default_1(app) {
                     matiere: matiere,
                 });
             }
-            catch {
-            }
+            catch { }
         }
         const ids = sujetIds.map(x => x.id);
         const filtered_sujets = [...[...app.server.database.cache.values()].filter(x => ids.includes(x.id)), ...sujetsData].sort((a, b) => b.id - a.id);

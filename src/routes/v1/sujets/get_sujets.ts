@@ -52,8 +52,7 @@ export default function (app: App): string
                     chapitre: chapitre,
                     matiere: matiere,
                 });
-            } catch {
-            }
+            } catch {}
         }
 
         const ids = sujetIds.map(x => x.id);

@@ -12,7 +12,7 @@ export default function (app: App): string
             return;
         }
 
-        const errors = app.checkBodyParam(["name", 'week', "pdf"], req.body);
+        const errors = app.checkBodyParam(["name", 'week'], req.body);
 
         if (errors.length > 0) {
             res.status(400).json({ errors });
@@ -22,7 +22,7 @@ export default function (app: App): string
         await app.server.database.demonstration.insert({
             id: null,
             name: req.body.name,
-            pdf: req.body.pdf,
+            pdf: req?.body?.pdf ?? null,
             week: req.body.week,
         });
 
