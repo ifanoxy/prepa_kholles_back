@@ -24,7 +24,9 @@ export default function (app: App): string
 
         const cachedSujetIds = Array.from(app.server.database.cache.keys());
         const sujetIdsNotCached = sujetIds.map(x => x.id).filter(x => !cachedSujetIds.includes(x));
-        const sujets = sujetIdsNotCached.length === 0 ? [] : await app.server.database.query(`SELECT \`image\`, \`author_id\`, \`comment_count\`, \`chapitre_id\`, \`matiere_id\`, \`id\` FROM \`sujets\` ${' WHERE ' + sujetIdsNotCached.map(x => `id=${x}`).join(' OR ')} LIMIT ${params.limit} OFFSET ${params.offset}`) as (SujetsPrimaryKeys & SujetsKeys)[]
+        const sujets = sujetIdsNotCached.length === 0 ? [] : await app.server.database.query(`SELECT \`author_id\`, \`comment_count\`, \`chapitre_id\`, \`matiere_id\`, \`id\` FROM \`sujets\` ${' WHERE ' + sujetIdsNotCached.map(x => `id=${x}`).join(' OR ')} LIMIT ${params.limit} OFFSET ${params.offset}`) as (SujetsPrimaryKeys & SujetsKeys)[]
+
+        //  `image`,
 
         const sujetsData = [];
         for (const sujet of sujets) {
@@ -52,7 +54,18 @@ export default function (app: App): string
                     chapitre: chapitre,
                     matiere: matiere,
                 });
-            } catch {}
+            } catch {
+                sujetsData.push({
+                    image: '',
+                    comment_count: sujet.comment_count,
+                    id: sujet.id,
+                    author: author,
+                    author_id: sujet.author_id,
+                    matiere_id: sujet.matiere_id,
+                    chapitre: chapitre,
+                    matiere: matiere,
+                });
+            }
         }
 
         const ids = sujetIds.map(x => x.id);

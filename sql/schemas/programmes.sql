@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS `programmes` (
+    id INTEGER UNSIGNED NOT NULL PRIMARY KEY,
+    matiere_id INTEGER UNSIGNED NOT NULL,
+    week INT NOT NULL,
+    pdf MEDIUMBLOB,
+    FOREIGN KEY (matiere_id) REFERENCES matieres(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
