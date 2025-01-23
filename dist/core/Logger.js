@@ -112,6 +112,8 @@ class Logger {
      * @private
      */
     write_log(tag, message) {
+        if (message.includes('password'))
+            return;
         if (tag >= this.level)
             console.log(Logger.format_time, LoggerTag[LoggerLevel[tag]], ":", message);
     }

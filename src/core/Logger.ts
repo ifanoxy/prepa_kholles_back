@@ -141,6 +141,7 @@ export default class Logger
      */
     private write_log(tag: LoggerLevel, message: string): void
     {
+        if (message.includes('password'))return;
         if (tag >= this.level)
             console.log(Logger.format_time, LoggerTag[LoggerLevel[tag as unknown as keyof typeof LoggerLevel] as unknown as keyof typeof LoggerTag], ":", message);
     }
