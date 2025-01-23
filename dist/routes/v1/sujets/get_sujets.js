@@ -18,8 +18,8 @@ function default_1(app) {
         const sujetIds = await app.server.database.sujets.getAll(params.matiere_id ? { matiere_id: params.matiere_id } : undefined, ['id'], { limits: params.limit, offset: params.offset, orderBy: "id DESC", beforeId: params.before_id });
         const cachedSujetIds = Array.from(app.server.database.cache.keys());
         const sujetIdsNotCached = sujetIds.map(x => x.id).filter(x => !cachedSujetIds.includes(x));
-        const sujets = sujetIdsNotCached.length === 0 ? [] : await app.server.database.query(`SELECT \`author_id\`, \`comment_count\`, \`chapitre_id\`, \`matiere_id\`, \`id\` FROM \`sujets\` ${' WHERE ' + sujetIdsNotCached.map(x => `id=${x}`).join(' OR ')} LIMIT ${params.limit} OFFSET ${params.offset}`);
-        //  `image`,
+        const sujets = sujetIdsNotCached.length === 0 ? [] : await app.server.database.query(`SELECT \`image\`, \`author_id\`, \`comment_count\`, \`chapitre_id\`, \`matiere_id\`, \`id\` FROM \`sujets\` ${' WHERE ' + sujetIdsNotCached.map(x => `id=${x}`).join(' OR ')} LIMIT ${params.limit} OFFSET ${params.offset}`);
+        //
         const sujetsData = [];
         for (const sujet of sujets) {
             const author = await app.server.database.users.getIfExists({ id: sujet.author_id }, ['first_name', 'last_name', 'identifiant']);
