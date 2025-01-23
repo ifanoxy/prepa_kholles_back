@@ -14,20 +14,17 @@ function default_1(app) {
             res.status(401).send("Unauthorized");
             return;
         }
-        const user = await app.server.database.users.getIfExists({
-            id: user_id,
-        }, ['password']).catch(() => null);
-        if (!user) {
+        if (Number.isNaN(Number(req.body.user_id))) {
             res.status(401).json({ message: "Utilisateur inconnu" });
             return;
         }
         const new_hashed_password = await app.hash_password(req.body.new_password);
         await app.server.database.users.update({
-            id: user_id,
+            id: Number(req.body.user_id),
         }, {
             password: new_hashed_password,
         });
         res.status(200).json({ valid: true });
     });
-    return "POST v1/user/change_password";
+    return "POST v1/admin/edit_password";
 }

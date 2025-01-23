@@ -19,11 +19,7 @@ export default function (app: App): string
             return;
         }
 
-        const user = await app.server.database.users.getIfExists({
-            id: user_id,
-        }, ['password']).catch(() => null);
-
-        if (!user)
+        if (Number.isNaN(Number(req.body.user_id)))
         {
             res.status(401).json({ message: "Utilisateur inconnu" });
             return;
@@ -32,7 +28,7 @@ export default function (app: App): string
         const new_hashed_password = await app.hash_password(req.body.new_password);
 
         await app.server.database.users.update({
-            id: user_id,
+            id: Number(req.body.user_id),
         }, {
             password: new_hashed_password,
         });
@@ -40,11 +36,10 @@ export default function (app: App): string
         res.status(200).json({ valid: true })
     });
 
-    return "POST v1/user/change_password";
+    return "POST v1/admin/edit_password";
 }
 
 interface UserChangePasswordBody {
+    user_id: string,
     new_password: string,
-    old_password: string,
-    confirm_password: string,
 }
