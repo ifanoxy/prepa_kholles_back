@@ -26,8 +26,6 @@ export default function (app: App): string
         const sujetIdsNotCached = sujetIds.map(x => x.id).filter(x => !cachedSujetIds.includes(x));
         const sujets = sujetIdsNotCached.length === 0 ? [] : await app.server.database.query(`SELECT \`image\`, \`author_id\`, \`comment_count\`, \`chapitre_id\`, \`matiere_id\`, \`id\` FROM \`sujets\` ${' WHERE ' + sujetIdsNotCached.map(x => `id=${x}`).join(' OR ')} LIMIT ${params.limit} OFFSET ${params.offset}`) as (SujetsPrimaryKeys & SujetsKeys)[]
 
-        //
-
         const sujetsData = [];
         for (const sujet of sujets) {
             const author = await app.server.database.users.getIfExists(
