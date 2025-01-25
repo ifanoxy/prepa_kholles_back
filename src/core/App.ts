@@ -19,6 +19,7 @@ export class App {
 
     public async init()
     {
+        this.errorHandler();
         this.app.use(cors({
             origin: "*",
         }))
@@ -190,5 +191,41 @@ export class App {
         }
 
         return errors;
+    }
+
+    private errorHandler() {
+        const DISCORD_USER_ID = "429345463494508554";
+
+        process.on('unhandledRejection', (reason) => {
+            this.server.log.error(reason);
+            this.server.discord?.getDMChannel(DISCORD_USER_ID)
+                .then(channel => {
+                    channel
+                        .createMessage(`Une erreur \`unhandledRejection\` est survenue : \`\`\`${JSON.stringify(reason)}\`\`\``)
+                        .catch(() => null);
+                })
+                .catch(() => null);
+        })
+
+        process.on('uncaughtException', (reason) => {
+            this.server.log.error(reason);
+            this.server.discord?.getDMChannel(DISCORD_USER_ID)
+                .then(channel => {
+                    channel
+                        .createMessage(`Une erreur \`uncaughtException\` est survenue : \`\`\`${JSON.stringify(reason)}\`\`\``)
+                        .catch(() => null);
+                })
+                .catch(() => null);
+        })
+        process.on('uncaughtExceptionMonitor', (reason) => {
+            this.server.log.error(reason);
+            this.server.discord?.getDMChannel(DISCORD_USER_ID)
+                .then(channel => {
+                    channel
+                        .createMessage(`Une erreur \`uncaughtExceptionMonitor\` est survenue : \`\`\`${JSON.stringify(reason)}\`\`\``)
+                        .catch(() => null);
+                })
+                .catch(() => null);
+        })
     }
 }

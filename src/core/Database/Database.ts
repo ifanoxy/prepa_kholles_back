@@ -31,7 +31,7 @@ export default class Database
     constructor(private readonly server: Server) {
         this.cache = new LRUCache({
             max: 1000,
-            ttl: 12 * 60 * 60000,
+            ttl: 3 * 24 * 60 * 60000,
         });
     }
 

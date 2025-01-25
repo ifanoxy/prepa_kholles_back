@@ -10,7 +10,7 @@ class Manager {
         this.tableName = tableName;
         this.cache = new lru_cache_1.default({
             max: cacheOptions.maxSize || 1000,
-            ttl: cacheOptions.ttl || 10 * 60000,
+            ttl: cacheOptions.ttl || 24 * 60 * 60000,
         });
         this.cacheDependencies = new Map();
     }

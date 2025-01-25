@@ -35,7 +35,7 @@ class Database {
         this.server = server;
         this.cache = new lru_cache_1.default({
             max: 1000,
-            ttl: 12 * 60 * 60000,
+            ttl: 3 * 24 * 60 * 60000,
         });
     }
     /**
