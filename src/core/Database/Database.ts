@@ -32,7 +32,21 @@ export default class Database
         this.cache = new LRUCache({
             max: 1000,
             ttl: 3 * 24 * 60 * 60000,
+            updateAgeOnGet: true
         });
+    }
+    public async resetConnection() {
+        this.connection?.ping()
+            .catch(async () => {
+                const
+                    host = process.env.API_DATABASE_HOST,
+                    port = Number(process.env.API_DATABASE_PORT),
+                    user = process.env.API_DATABASE_USER,
+                    password = process.env.API_DATABASE_PASSWORD,
+                    database = process.env.API_DATABASE_NAME;
+
+                this.connection = await createConnection({ host, port, user, password, database });
+            })
     }
 
     /**

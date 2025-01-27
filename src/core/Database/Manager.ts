@@ -13,6 +13,7 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
         this.cache = new LRUCache({
             max: cacheOptions.maxSize || 1000,
             ttl: cacheOptions.ttl || 24 * 60 * 60000,
+            updateAgeOnGet: true,
         });
         this.cacheDependencies = new Map();
     }
@@ -218,7 +219,12 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
      */
     public async getIfExists(where: PartialKeys<PrimaryKeys, "id"> & Partial<Keys>, includes: IncludesType<Keys & PrimaryKeys> | "*" = "*"): Promise<PrimaryKeys & Keys | null>
     {
-        return await this.has(where) ? this.get(where, includes) : null;
+        try {
+            const get = await this.get(where, includes);
+            return get ? get : null;
+        } catch {
+            return null;
+        }
     }
 
     /**

@@ -11,6 +11,7 @@ class Manager {
         this.cache = new lru_cache_1.default({
             max: cacheOptions.maxSize || 1000,
             ttl: cacheOptions.ttl || 24 * 60 * 60000,
+            updateAgeOnGet: true,
         });
         this.cacheDependencies = new Map();
     }
@@ -191,7 +192,13 @@ class Manager {
      * @param {(Keys & PrimaryKeys)[]} includes Les attributs qui seront retournée (* par défaut)
      */
     async getIfExists(where, includes = "*") {
-        return await this.has(where) ? this.get(where, includes) : null;
+        try {
+            const get = await this.get(where, includes);
+            return get ? get : null;
+        }
+        catch {
+            return null;
+        }
     }
     /**
      * Modifie ou Ajoute une ligne dans la base de donnée
