@@ -15,7 +15,7 @@ export default function (app: App): string
 
         const demosData = await app.server.database.demonstration.getAll();
 
-        res.status(200).json({ data: demosData.map(x => ({...x, pdf: x?.pdf?.toString() ?? null })) });
+        res.status(200).json({ data: await Promise.all(demosData.map(async x => ({...x, pdf: x?.pdf?.toString() ?? null, author: x.author_id ? await app.server.database.users.get({ id: x.author_id }) : null }))) });
     });
 
     return "GET v1/demonstrations";
