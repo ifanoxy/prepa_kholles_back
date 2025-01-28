@@ -6,4 +6,5 @@ export interface DemonstrationKeys {
     name: string,
     week: number,
     pdf: string,
+    author_id: number
 }

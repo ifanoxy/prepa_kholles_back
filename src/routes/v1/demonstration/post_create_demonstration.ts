@@ -24,6 +24,7 @@ export default function (app: App): string
             name: req.body.name,
             pdf: req?.body?.pdf ?? null,
             week: req.body.week,
+            author_id: user_id
         });
 
         res.status(200).json({ message: `Successfully created` });
