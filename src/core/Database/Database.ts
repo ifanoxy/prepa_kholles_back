@@ -1,6 +1,5 @@
 import Server from "../Server";
-import {createConnection, createPool, QueryResult, RowDataPacket} from "mysql2/promise";
-import {Connection} from "mysql2/promise";
+import {createPool, Pool, QueryResult, RowDataPacket} from "mysql2/promise";
 import Manager from "./Manager";
 import {UsersKeys, UsersPrimaryKeys} from "../../types/schemas/Users";
 import * as fs from "fs";
@@ -16,7 +15,7 @@ import {ProgrammesKeys, ProgrammesPrimaryKeys} from "../../types/schemas/Program
 
 export default class Database
 {
-    private connection: Connection | undefined;
+    private pool: Pool | undefined;
     public users!: Manager<UsersPrimaryKeys, UsersKeys>;
     public chapitres!: Manager<ChapitresPrimaryKey, ChapitresKeys>;
     public matieres!: Manager<MatieresPrimaryKeys, MatieresKeys>;
@@ -36,55 +35,6 @@ export default class Database
         });
     }
 
-    public async checkConnection() {
-        return await new Promise(async (res, rej) => {
-            try
-            {
-                if (this.connection)
-                    this.connection?.ping()
-                        .then(() => res(1))
-                        .catch(async (e) =>
-                        {
-                            const
-                                host = process.env.API_DATABASE_HOST,
-                                port = Number(process.env.API_DATABASE_PORT),
-                                user = process.env.API_DATABASE_USER,
-                                password = process.env.API_DATABASE_PASSWORD,
-                                database = process.env.API_DATABASE_NAME;
-
-                            this.connection = await createConnection({
-                                host,
-                                port,
-                                user,
-                                password,
-                                database,
-                                idleTimeout: 5 * 60 * 1000
-                            });
-                            res(1);
-                        });
-                const
-                    host = process.env.API_DATABASE_HOST,
-                    port = Number(process.env.API_DATABASE_PORT),
-                    user = process.env.API_DATABASE_USER,
-                    password = process.env.API_DATABASE_PASSWORD,
-                    database = process.env.API_DATABASE_NAME;
-
-                this.connection = await createConnection({
-                    host,
-                    port,
-                    user,
-                    password,
-                    database,
-                    idleTimeout: 5 * 60 * 1000
-                });
-                res(1);
-            } catch (e) {
-                this.server.log.error(e);
-                rej(e)
-            }
-        })
-    }
-
     /**
      * Permet de créer une connection avec la base de donnée
      */
@@ -100,13 +50,13 @@ export default class Database
         if (!host || Number.isNaN(port) || !user || !password || !database)
             throw new Error("Identifiants de connexion à la base de donnée manquants");
 
-        console.log("azodij")
-        await this.checkConnection();
-        console.log("azodij")
-
-        this.connection?.on('error', async (err) => {
-            this.server.log.error(err);
-        })
+        this.pool = createPool({
+            host,
+            port,
+            user,
+            password,
+            database,
+        });
     }
 
     /**
@@ -146,9 +96,11 @@ export default class Database
      */
     public async query<T extends QueryResult = RowDataPacket[]>(query: string): Promise<T>
     {
-        await this.checkConnection();
+        const con = await this.pool?.getConnection();
         if (query.length <= 200)
             this.server.log.trace(query);
-        return (await this.connection!.query(query))[0] as T;
+        const res = (await con!.query(query))[0] as T;
+        con?.release();
+        return res;
     }
 }

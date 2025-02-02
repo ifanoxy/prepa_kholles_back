@@ -12,8 +12,8 @@ export default class Server {
     public config: Config;
 
     constructor() {
-        this.database = new Database(this);
         this.log = new Logger();
+        this.database = new Database(this);
         this.config = new Config();
         this.discord = process.env.DISCORD_TOKEN ? new DiscordClient(this) : null;
         this.app = new App(this);

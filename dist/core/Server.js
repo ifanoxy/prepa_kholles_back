@@ -10,8 +10,8 @@ const Discord_1 = require("./Discord");
 const Config_1 = require("./Config");
 class Server {
     constructor() {
-        this.database = new Database_1.default(this);
         this.log = new Logger_1.default();
+        this.database = new Database_1.default(this);
         this.config = new Config_1.Config();
         this.discord = process.env.DISCORD_TOKEN ? new Discord_1.DiscordClient(this) : null;
         this.app = new App_1.App(this);

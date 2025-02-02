@@ -39,41 +39,6 @@ class Database {
             updateAgeOnGet: true
         });
     }
-    async checkConnection() {
-        return await new Promise(async (res, rej) => {
-            try {
-                if (this.connection)
-                    this.connection?.ping()
-                        .then(() => res(1))
-                        .catch(async (e) => {
-                        const host = process.env.API_DATABASE_HOST, port = Number(process.env.API_DATABASE_PORT), user = process.env.API_DATABASE_USER, password = process.env.API_DATABASE_PASSWORD, database = process.env.API_DATABASE_NAME;
-                        this.connection = await (0, promise_1.createConnection)({
-                            host,
-                            port,
-                            user,
-                            password,
-                            database,
-                            idleTimeout: 5 * 60 * 1000
-                        });
-                        res(1);
-                    });
-                const host = process.env.API_DATABASE_HOST, port = Number(process.env.API_DATABASE_PORT), user = process.env.API_DATABASE_USER, password = process.env.API_DATABASE_PASSWORD, database = process.env.API_DATABASE_NAME;
-                this.connection = await (0, promise_1.createConnection)({
-                    host,
-                    port,
-                    user,
-                    password,
-                    database,
-                    idleTimeout: 5 * 60 * 1000
-                });
-                res(1);
-            }
-            catch (e) {
-                this.server.log.error(e);
-                rej(e);
-            }
-        });
-    }
     /**
      * Permet de créer une connection avec la base de donnée
      */
@@ -81,11 +46,12 @@ class Database {
         const host = process.env.API_DATABASE_HOST, port = Number(process.env.API_DATABASE_PORT), user = process.env.API_DATABASE_USER, password = process.env.API_DATABASE_PASSWORD, database = process.env.API_DATABASE_NAME;
         if (!host || Number.isNaN(port) || !user || !password || !database)
             throw new Error("Identifiants de connexion à la base de donnée manquants");
-        console.log("azodij");
-        await this.checkConnection();
-        console.log("azodij");
-        this.connection?.on('error', async (err) => {
-            this.server.log.error(err);
+        this.pool = (0, promise_1.createPool)({
+            host,
+            port,
+            user,
+            password,
+            database,
         });
     }
     /**
@@ -117,10 +83,12 @@ class Database {
      * @param {string} query
      */
     async query(query) {
-        await this.checkConnection();
+        const con = await this.pool?.getConnection();
         if (query.length <= 200)
             this.server.log.trace(query);
-        return (await this.connection.query(query))[0];
+        const res = (await con.query(query))[0];
+        con?.release();
+        return res;
     }
 }
 exports.default = Database;
