@@ -206,9 +206,6 @@ export class App {
                         .catch(() => null);
                 })
                 .catch(() => null);
-            try {
-                this.server.database.resetConnection();
-            } catch {}
         })
 
         process.on('uncaughtException', (reason) => {
@@ -220,9 +217,6 @@ export class App {
                         .catch(() => null);
                 })
                 .catch(() => null);
-            try {
-                this.server.database.resetConnection();
-            } catch {}
         })
         process.on('uncaughtExceptionMonitor', (reason) => {
             this.server.log.error(reason);
@@ -233,9 +227,6 @@ export class App {
                         .catch(() => null);
                 })
                 .catch(() => null);
-            try {
-                this.server.database.resetConnection();
-            } catch {}
         })
     }
 }
