@@ -80,6 +80,7 @@ export default class Database
      */
     public async loadTables(): Promise<void>
     {
+        return;
         const tables = fs.readdirSync('./sql/schemas');
 
         for (let table of tables)
@@ -96,11 +97,8 @@ export default class Database
      */
     public async query<T extends QueryResult = RowDataPacket[]>(query: string): Promise<T>
     {
-        const con = await this.pool?.getConnection();
         if (query.length <= 200)
             this.server.log.trace(query);
-        const res = (await con!.query(query))[0] as T;
-        con?.release();
-        return res;
+        return (await this.pool!.query(query))[0] as T;
     }
 }

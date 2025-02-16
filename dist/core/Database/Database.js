@@ -72,6 +72,7 @@ class Database {
      * Charger les tables de la base de donnée
      */
     async loadTables() {
+        return;
         const tables = fs.readdirSync('./sql/schemas');
         for (let table of tables) {
             const file = fs.readFileSync(`./sql/schemas/${table}`, { encoding: 'utf-8' });
@@ -83,12 +84,9 @@ class Database {
      * @param {string} query
      */
     async query(query) {
-        const con = await this.pool?.getConnection();
         if (query.length <= 200)
             this.server.log.trace(query);
-        const res = (await con.query(query))[0];
-        con?.release();
-        return res;
+        return (await this.pool.query(query))[0];
     }
 }
 exports.default = Database;

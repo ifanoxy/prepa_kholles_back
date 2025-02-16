@@ -5,7 +5,7 @@ function default_1(app) {
     app.app.delete("/v1/sujet/:sujet_id", async (req, res) => {
         const token = req.headers?.authorization?.split(' ')[1];
         const user_id = token ? await app.isAuth(token) : false;
-        if (!Number.isNaN(Number(req.params.sujet_id))) {
+        if (Number.isNaN(Number(req.params.sujet_id))) {
             res.status(400).send("Bad Request");
             return;
         }
