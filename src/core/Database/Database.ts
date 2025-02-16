@@ -101,4 +101,26 @@ export default class Database
             this.server.log.trace(query);
         return (await this.con!.query(query))[0] as T;
     }
+
+    public async checkCon() {
+        try {
+            this.con?.ping()
+        } catch {
+            this.con?.destroy();
+            const
+                host = process.env.API_DATABASE_HOST,
+                port = Number(process.env.API_DATABASE_PORT),
+                user = process.env.API_DATABASE_USER,
+                password = process.env.API_DATABASE_PASSWORD,
+                database = process.env.API_DATABASE_NAME;
+
+            this.con = await createConnection({
+                host,
+                port,
+                user,
+                password,
+                database,
+            });
+        }
+    }
 }

@@ -206,6 +206,7 @@ export class App {
                         .catch(() => null);
                 })
                 .catch(() => null);
+            this.server.database.checkCon();
         })
 
         process.on('uncaughtException', (reason) => {
@@ -217,6 +218,7 @@ export class App {
                         .catch(() => null);
                 })
                 .catch(() => null);
+            this.server.database.checkCon();
         })
         process.on('uncaughtExceptionMonitor', (reason) => {
             this.server.log.error(reason);
@@ -227,6 +229,7 @@ export class App {
                         .catch(() => null);
                 })
                 .catch(() => null);
+            this.server.database.checkCon();
         })
     }
 }
