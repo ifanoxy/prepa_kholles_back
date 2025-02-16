@@ -1,5 +1,5 @@
 import Server from "../Server";
-import {createPool, Pool, QueryResult, RowDataPacket} from "mysql2/promise";
+import {Connection, createConnection, createPool, Pool, QueryResult, RowDataPacket} from "mysql2/promise";
 import Manager from "./Manager";
 import {UsersKeys, UsersPrimaryKeys} from "../../types/schemas/Users";
 import * as fs from "fs";
@@ -15,7 +15,7 @@ import {ProgrammesKeys, ProgrammesPrimaryKeys} from "../../types/schemas/Program
 
 export default class Database
 {
-    private pool: Pool | undefined;
+    private con: Connection | undefined;
     public users!: Manager<UsersPrimaryKeys, UsersKeys>;
     public chapitres!: Manager<ChapitresPrimaryKey, ChapitresKeys>;
     public matieres!: Manager<MatieresPrimaryKeys, MatieresKeys>;
@@ -50,7 +50,7 @@ export default class Database
         if (!host || Number.isNaN(port) || !user || !password || !database)
             throw new Error("Identifiants de connexion à la base de donnée manquants");
 
-        this.pool = createPool({
+        this.con = await createConnection({
             host,
             port,
             user,
@@ -99,6 +99,6 @@ export default class Database
     {
         if (query.length <= 200)
             this.server.log.trace(query);
-        return (await this.pool!.query(query))[0] as T;
+        return (await this.con!.query(query))[0] as T;
     }
 }

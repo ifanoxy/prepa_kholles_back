@@ -46,7 +46,7 @@ class Database {
         const host = process.env.API_DATABASE_HOST, port = Number(process.env.API_DATABASE_PORT), user = process.env.API_DATABASE_USER, password = process.env.API_DATABASE_PASSWORD, database = process.env.API_DATABASE_NAME;
         if (!host || Number.isNaN(port) || !user || !password || !database)
             throw new Error("Identifiants de connexion à la base de donnée manquants");
-        this.pool = (0, promise_1.createPool)({
+        this.con = await (0, promise_1.createConnection)({
             host,
             port,
             user,
@@ -86,7 +86,7 @@ class Database {
     async query(query) {
         if (query.length <= 200)
             this.server.log.trace(query);
-        return (await this.pool.query(query))[0];
+        return (await this.con.query(query))[0];
     }
 }
 exports.default = Database;
