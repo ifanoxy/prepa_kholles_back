@@ -93,7 +93,10 @@ class Database {
             this.con?.ping();
         }
         catch {
-            this.con?.destroy();
+            try {
+                this.con?.destroy();
+            }
+            catch { }
             const host = process.env.API_DATABASE_HOST, port = Number(process.env.API_DATABASE_PORT), user = process.env.API_DATABASE_USER, password = process.env.API_DATABASE_PASSWORD, database = process.env.API_DATABASE_NAME;
             this.con = await (0, promise_1.createConnection)({
                 host,

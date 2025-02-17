@@ -106,7 +106,10 @@ export default class Database
         try {
             this.con?.ping()
         } catch {
-            this.con?.destroy();
+            try {
+                this.con?.destroy();
+            } catch {}
+
             const
                 host = process.env.API_DATABASE_HOST,
                 port = Number(process.env.API_DATABASE_PORT),

@@ -10,7 +10,7 @@ export default function (app: App): string
         if (!token || !await app.isAuth(token))
         {
             res.status(401).send("Unauthorized");
-            return;
+            return; 
         }
 
         const demosData = await app.server.database.demonstration.getAll();
