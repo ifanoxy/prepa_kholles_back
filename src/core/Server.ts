@@ -21,7 +21,7 @@ export default class Server {
         this.discord = process.env.DISCORD_TOKEN ? new DiscordClient(this) : null;
         this.app = new App(this);
         this.mistral = new Mistral({
-            apiKey: 'FVjeQRdrUgiTf6OBNuKKc4twqo2gzHZN'
+            apiKey: process.env.API_TOKEN_MISTRAL_AI,
         });
         this.mistral_tokens = {
             remaining: 32000000,
