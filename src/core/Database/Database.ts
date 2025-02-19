@@ -1,21 +1,20 @@
 import Server from "../Server";
-import {Connection, createConnection, createPool, Pool, QueryResult, RowDataPacket} from "mysql2/promise";
+import { createPool, Pool, QueryResult, RowDataPacket } from "mysql2/promise";
 import Manager from "./Manager";
-import {UsersKeys, UsersPrimaryKeys} from "../../types/schemas/Users";
+import { UsersKeys, UsersPrimaryKeys } from "../../types/schemas/Users";
 import * as fs from "fs";
 import LRUCache from "lru-cache";
-import {ChapitresKeys, ChapitresPrimaryKey} from "../../types/schemas/Chapitres";
-import {MatieresKeys, MatieresPrimaryKeys} from "../../types/schemas/Matieres";
-import {SujetsKeys, SujetsPrimaryKeys} from "../../types/schemas/Sujets";
-import {PermissionsKeys, PermissionsPrimaryKeys} from "../../types/schemas/Permissions";
-import {CommentsKeys, CommentsPrimaryKeys} from "../../types/schemas/Comments";
-import {KhollesPlanningKeys, KhollesPlanningPrimaryKeys} from "../../types/schemas/kholles_planning";
-import {DemonstrationKeys, DemonstrationPrimaryKeys} from "../../types/schemas/Demonstration";
-import {ProgrammesKeys, ProgrammesPrimaryKeys} from "../../types/schemas/Programmes";
+import { ChapitresKeys, ChapitresPrimaryKey } from "../../types/schemas/Chapitres";
+import { MatieresKeys, MatieresPrimaryKeys } from "../../types/schemas/Matieres";
+import { SujetsKeys, SujetsPrimaryKeys } from "../../types/schemas/Sujets";
+import { PermissionsKeys, PermissionsPrimaryKeys } from "../../types/schemas/Permissions";
+import { CommentsKeys, CommentsPrimaryKeys } from "../../types/schemas/Comments";
+import { KhollesPlanningKeys, KhollesPlanningPrimaryKeys } from "../../types/schemas/kholles_planning";
+import { DemonstrationKeys, DemonstrationPrimaryKeys } from "../../types/schemas/Demonstration";
+import { ProgrammesKeys, ProgrammesPrimaryKeys } from "../../types/schemas/Programmes";
 
-export default class Database
-{
-    private con: Connection | undefined;
+export default class Database {
+    private pool: Pool;
     public users!: Manager<UsersPrimaryKeys, UsersKeys>;
     public chapitres!: Manager<ChapitresPrimaryKey, ChapitresKeys>;
     public matieres!: Manager<MatieresPrimaryKeys, MatieresKeys>;
@@ -25,7 +24,7 @@ export default class Database
     public planning!: Manager<KhollesPlanningPrimaryKeys, KhollesPlanningKeys>;
     public demonstration!: Manager<DemonstrationPrimaryKeys, DemonstrationKeys>;
     public programmes!: Manager<ProgrammesPrimaryKeys, ProgrammesKeys>;
-    public cache: LRUCache<number, SujetsPrimaryKeys & SujetsKeys> ;
+    public cache: LRUCache<number, SujetsPrimaryKeys & SujetsKeys>;
 
     constructor(private readonly server: Server) {
         this.cache = new LRUCache({
@@ -33,37 +32,23 @@ export default class Database
             ttl: 3 * 24 * 60 * 60000,
             updateAgeOnGet: true
         });
-    }
 
-    /**
-     * Permet de créer une connection avec la base de donnée
-     */
-    public async authenticate(): Promise<void>
-    {
-        const
-            host = process.env.API_DATABASE_HOST,
-            port = Number(process.env.API_DATABASE_PORT),
-            user = process.env.API_DATABASE_USER,
-            password = process.env.API_DATABASE_PASSWORD,
-            database = process.env.API_DATABASE_NAME;
-
-        if (!host || Number.isNaN(port) || !user || !password || !database)
-            throw new Error("Identifiants de connexion à la base de donnée manquants");
-
-        this.con = await createConnection({
-            host,
-            port,
-            user,
-            password,
-            database,
+        this.pool = createPool({
+            host: process.env.API_DATABASE_HOST,
+            port: Number(process.env.API_DATABASE_PORT),
+            user: process.env.API_DATABASE_USER,
+            password: process.env.API_DATABASE_PASSWORD,
+            database: process.env.API_DATABASE_NAME,
+            waitForConnections: true,
+            connectionLimit: 25,
+            queueLimit: 0
         });
     }
 
     /**
      * Charger les managers de la base de donnée
      */
-    public async loadManagers(): Promise<void>
-    {
+    public async loadManagers(): Promise<void> {
         this.users = new Manager<UsersPrimaryKeys, UsersKeys>(this, "users");
         this.chapitres = new Manager<ChapitresPrimaryKey, ChapitresKeys>(this, "chapitres");
         this.matieres = new Manager<MatieresPrimaryKeys, MatieresKeys>(this, "matieres");
@@ -78,15 +63,11 @@ export default class Database
     /**
      * Charger les tables de la base de donnée
      */
-    public async loadTables(): Promise<void>
-    {
-        return;
+    public async loadTables(): Promise<void> {
         const tables = fs.readdirSync('./sql/schemas');
 
-        for (let table of tables)
-        {
+        for (let table of tables) {
             const file = fs.readFileSync(`./sql/schemas/${table}`, { encoding: 'utf-8' });
-
             await this.query(file);
         }
     }
@@ -95,34 +76,28 @@ export default class Database
      * Permet de faire de requête SQL à la base de donnée
      * @param {string} query
      */
-    public async query<T extends QueryResult = RowDataPacket[]>(query: string): Promise<T>
-    {
-        if (query.length <= 200)
+    public async query<T extends QueryResult = RowDataPacket[]>(query: string): Promise<T> {
+        if (query.length <= 200) {
             this.server.log.trace(query);
-        return (await this.con!.query(query))[0] as T;
+        }
+
+        const [results] = await this.pool.query(query);
+        return results as T;
     }
 
     public async checkCon() {
         try {
-            this.con?.ping()
+            await this.pool.getConnection();
         } catch {
-            try {
-                this.con?.destroy();
-            } catch {}
-
-            const
-                host = process.env.API_DATABASE_HOST,
-                port = Number(process.env.API_DATABASE_PORT),
-                user = process.env.API_DATABASE_USER,
-                password = process.env.API_DATABASE_PASSWORD,
-                database = process.env.API_DATABASE_NAME;
-
-            this.con = await createConnection({
-                host,
-                port,
-                user,
-                password,
-                database,
+            this.pool = createPool({
+                host: process.env.API_DATABASE_HOST,
+                port: Number(process.env.API_DATABASE_PORT),
+                user: process.env.API_DATABASE_USER,
+                password: process.env.API_DATABASE_PASSWORD,
+                database: process.env.API_DATABASE_NAME,
+                waitForConnections: true,
+                connectionLimit: 25,
+                queueLimit: 0
             });
         }
     }

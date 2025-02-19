@@ -22,7 +22,6 @@ export default class Server {
     async init()
     {
         this.log.info("Lancement du serveur en cours...")
-        await this.database.authenticate();
         await this.database.loadTables();
         await this.database.loadManagers();
 

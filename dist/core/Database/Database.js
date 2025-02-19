@@ -38,20 +38,15 @@ class Database {
             ttl: 3 * 24 * 60 * 60000,
             updateAgeOnGet: true
         });
-    }
-    /**
-     * Permet de créer une connection avec la base de donnée
-     */
-    async authenticate() {
-        const host = process.env.API_DATABASE_HOST, port = Number(process.env.API_DATABASE_PORT), user = process.env.API_DATABASE_USER, password = process.env.API_DATABASE_PASSWORD, database = process.env.API_DATABASE_NAME;
-        if (!host || Number.isNaN(port) || !user || !password || !database)
-            throw new Error("Identifiants de connexion à la base de donnée manquants");
-        this.con = await (0, promise_1.createConnection)({
-            host,
-            port,
-            user,
-            password,
-            database,
+        this.pool = (0, promise_1.createPool)({
+            host: process.env.API_DATABASE_HOST,
+            port: Number(process.env.API_DATABASE_PORT),
+            user: process.env.API_DATABASE_USER,
+            password: process.env.API_DATABASE_PASSWORD,
+            database: process.env.API_DATABASE_NAME,
+            waitForConnections: true,
+            connectionLimit: 25,
+            queueLimit: 0
         });
     }
     /**
@@ -72,7 +67,6 @@ class Database {
      * Charger les tables de la base de donnée
      */
     async loadTables() {
-        return;
         const tables = fs.readdirSync('./sql/schemas');
         for (let table of tables) {
             const file = fs.readFileSync(`./sql/schemas/${table}`, { encoding: 'utf-8' });
@@ -84,26 +78,26 @@ class Database {
      * @param {string} query
      */
     async query(query) {
-        if (query.length <= 200)
+        if (query.length <= 200) {
             this.server.log.trace(query);
-        return (await this.con.query(query))[0];
+        }
+        const [results] = await this.pool.query(query);
+        return results;
     }
     async checkCon() {
         try {
-            this.con?.ping();
+            await this.pool.getConnection();
         }
         catch {
-            try {
-                this.con?.destroy();
-            }
-            catch { }
-            const host = process.env.API_DATABASE_HOST, port = Number(process.env.API_DATABASE_PORT), user = process.env.API_DATABASE_USER, password = process.env.API_DATABASE_PASSWORD, database = process.env.API_DATABASE_NAME;
-            this.con = await (0, promise_1.createConnection)({
-                host,
-                port,
-                user,
-                password,
-                database,
+            this.pool = (0, promise_1.createPool)({
+                host: process.env.API_DATABASE_HOST,
+                port: Number(process.env.API_DATABASE_PORT),
+                user: process.env.API_DATABASE_USER,
+                password: process.env.API_DATABASE_PASSWORD,
+                database: process.env.API_DATABASE_NAME,
+                waitForConnections: true,
+                connectionLimit: 25,
+                queueLimit: 0
             });
         }
     }

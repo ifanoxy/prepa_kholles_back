@@ -45,6 +45,7 @@ export default function (app: App): string
 
             valid_token = app.generateAPIToken(user.id, user.password);
         }
+
         res.status(200).json({ [req.body.token ? 'user_id' : 'token']: valid_token });
     });
 
