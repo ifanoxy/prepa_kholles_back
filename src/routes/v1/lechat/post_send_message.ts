@@ -3,29 +3,14 @@ import {SystemMessage} from "@mistralai/mistralai/models/components";
 
 async function sendMessageToMistralAI(history: { message: string, author: "Vous" | "Le chat" }[], app: App): Promise<any> {
     try {
-        console.log(history.length == 1 ? [
-            {
-                role: "system",
-                content: `Réponds en français. Et envoie ton message de réponse en markdown`
-            },
-            {
-                content: history[0].message,
-                role: "user",
-            },
-        ] : [
-            ...history.map(x => ({
-                role: x.author === "Vous" ? "user" : "assistant",
-                content: x.message
-            })) as SystemMessage & { role: "user" | "assistant" },
-        ])
-
+        console.log(history)
         return await app.server.mistral.chat.complete({
             model: "mistral-small-latest",
             stream: false,
             messages: [
                 {
                     role: "system",
-                    content: `Réponds en français. Et envoie ton message de réponse en markdown. Si tu veux écrire tu latex, tu devras le mettre sous le format "\`$ latex $\`" ou "\`@ latex \`@"`
+                    content: `Réponds en français. Et envoie ton message de réponse en markdown. pour écrire du Latex, tu devras le mettre le préfix et suffix "\`$", "$\`" ou "\`@", "\`@"`
                 },
                 ...history.map(x => ({
                     role: x.author === "Vous" ? "user" : "assistant",

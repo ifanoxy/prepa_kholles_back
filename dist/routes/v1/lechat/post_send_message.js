@@ -3,28 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 async function sendMessageToMistralAI(history, app) {
     try {
-        console.log(history.length == 1 ? [
-            {
-                role: "system",
-                content: `Réponds en français. Et envoie ton message de réponse en markdown`
-            },
-            {
-                content: history[0].message,
-                role: "user",
-            },
-        ] : [
-            ...history.map(x => ({
-                role: x.author === "Vous" ? "user" : "assistant",
-                content: x.message
-            })),
-        ]);
+        console.log(history);
         return await app.server.mistral.chat.complete({
             model: "mistral-small-latest",
             stream: false,
             messages: [
                 {
                     role: "system",
-                    content: `Réponds en français. Et envoie ton message de réponse en markdown. Si tu veux écrire tu latex, tu devras le mettre sous le format "\`$ latex $\`" ou "\`@ latex \`@"`
+                    content: `Réponds en français. Et envoie ton message de réponse en markdown. pour écrire du Latex, tu devras le mettre le préfix et suffix "\`$", "$\`" ou "\`@", "\`@"`
                 },
                 ...history.map(x => ({
                     role: x.author === "Vous" ? "user" : "assistant",
