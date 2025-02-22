@@ -10,7 +10,7 @@ async function sendMessageToMistralAI(history: { message: string, author: "Vous"
             messages: [
                 {
                     role: "system",
-                    content: `Réponds en français. Et envoie ton message de réponse en markdown. Afin d'écrire du LateX, tu dois utiliser les délimiteurs "$" (une ligne) ou "$$" (multi-ligne)`
+                    content: `Réponds en français. Et envoie ton message de réponse en markdown. si tu veux écrire du LateX, tu dois utiliser les délimiteurs "$" (une ligne) ou "$$" (multi-ligne) autour de l'expression LateX`
                 },
                 ...history.map(x => ({
                     role: x.author === "Vous" ? "user" : "assistant",
