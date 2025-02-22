@@ -24,7 +24,7 @@ async function sendMessageToMistralAI(history, app) {
             messages: [
                 {
                     role: "system",
-                    content: `Réponds en français. Et envoie ton message de réponse en markdown`
+                    content: `Réponds en français. Et envoie ton message de réponse en markdown. Si tu veux écrire tu latex, tu devras le mettre sous le format "\`$ latex $\`" ou "\`@ latex \`@"`
                 },
                 ...history.map(x => ({
                     role: x.author === "Vous" ? "user" : "assistant",
