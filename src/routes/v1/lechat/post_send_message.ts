@@ -10,7 +10,7 @@ async function sendMessageToMistralAI(history: { message: string, author: "Vous"
             messages: [
                 {
                     role: "system",
-                    content: `Réponds en français. Et envoie ton message de réponse en markdown. pour écrire du Latex, tu devras le mettre le préfix et suffix "\`$", "$\`" ou "\`@", "\`@"`
+                    content: `Réponds en français. Et envoie ton message de réponse en markdown.`
                 },
                 ...history.map(x => ({
                     role: x.author === "Vous" ? "user" : "assistant",
