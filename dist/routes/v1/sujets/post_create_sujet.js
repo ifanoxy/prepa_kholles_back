@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
+const MysqlDate_1 = require("../../../types/utils/MysqlDate");
 function default_1(app) {
     app.app.post("/v1/sujets/create", async (req, res) => {
         const token = req.headers?.authorization?.split(' ')[1];
@@ -24,6 +25,11 @@ function default_1(app) {
             author_id: user_id,
             image: req.body.image,
             chapitre_id: req.body.chapitre_id ? req.body.chapitre_id : null
+        });
+        await app.server.database.users.update({
+            id: user_id
+        }, {
+            last_post_date: (0, MysqlDate_1.DateToMysqlDate)()
         });
         res.status(200).json({ message: `Successfully created` });
         if (app.server.discord) {

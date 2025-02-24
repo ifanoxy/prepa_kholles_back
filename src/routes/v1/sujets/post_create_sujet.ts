@@ -1,5 +1,6 @@
 import {App} from "../../../core/App";
 import {Request} from "express"
+import {DateToMysqlDate} from "../../../types/utils/MysqlDate";
 
 export default function (app: App): string
 {
@@ -33,6 +34,13 @@ export default function (app: App): string
             image: req.body.image,
             chapitre_id: req.body.chapitre_id ? req.body.chapitre_id : null
         });
+
+        await app.server.database.users.update({
+            id: user_id
+        }, {
+            last_post_date: DateToMysqlDate()
+        });
+
         res.status(200).json({ message: `Successfully created` });
 
         if (app.server.discord)

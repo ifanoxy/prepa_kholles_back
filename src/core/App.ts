@@ -199,10 +199,11 @@ export class App {
 
         process.on('unhandledRejection', (reason) => {
             this.server.log.error(reason);
+            console.log(reason)
             this.server.discord?.getDMChannel(DISCORD_USER_ID)
                 .then(channel => {
                     channel
-                        .createMessage(`Une erreur \`unhandledRejection\` est survenue : \`\`\`${JSON.stringify(reason)}\`\`\``)
+                        .createMessage(`Une erreur \`unhandledRejection\` est survenue : \`\`\`${reason}\`\`\``)
                         .catch(() => null);
                 })
                 .catch(() => null);
@@ -211,10 +212,11 @@ export class App {
 
         process.on('uncaughtException', (reason) => {
             this.server.log.error(reason);
+            console.log(reason)
             this.server.discord?.getDMChannel(DISCORD_USER_ID)
                 .then(channel => {
                     channel
-                        .createMessage(`Une erreur \`uncaughtException\` est survenue : \`\`\`${JSON.stringify(reason)}\`\`\``)
+                        .createMessage(`Une erreur \`uncaughtException\` est survenue : \`\`\`${reason}\`\`\``)
                         .catch(() => null);
                 })
                 .catch(() => null);
@@ -222,10 +224,11 @@ export class App {
         })
         process.on('uncaughtExceptionMonitor', (reason) => {
             this.server.log.error(reason);
+            console.log(reason)
             this.server.discord?.getDMChannel(DISCORD_USER_ID)
                 .then(channel => {
                     channel
-                        .createMessage(`Une erreur \`uncaughtExceptionMonitor\` est survenue : \`\`\`${JSON.stringify(reason)}\`\`\``)
+                        .createMessage(`Une erreur \`uncaughtExceptionMonitor\` est survenue : \`\`\`${reason}\`\`\``)
                         .catch(() => null);
                 })
                 .catch(() => null);

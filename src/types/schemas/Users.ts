@@ -1,4 +1,5 @@
 import { UserPermissions } from "../UserPermissions";
+import {MysqlDate} from "../utils/MysqlDate";
 
 interface UsersPrimaryKeys
 {
@@ -29,6 +30,10 @@ interface UsersKeys
     password: string;
     group: number;
     permission: UserPermissions;
+    /**
+     * Date du dernier post de sujet
+     */
+    last_post_date?: string;
     /**
      * Longueur maximal 32
      */
