@@ -17,7 +17,7 @@ class DiscordClient extends eris_1.Client {
         this.handler.loadCommands();
         this.handler.loadSelect();
         this.server.log.info("[DiscordClient] Connexion à Discord en cours...");
-        await this.connect();
+        await this.connect().catch(() => this.server.log.warn("[DiscordClient] La connexion à discord à échoué"));
         this.server.log.info("[DiscordClient] Connecté à discord");
     }
     async loadCommands() {

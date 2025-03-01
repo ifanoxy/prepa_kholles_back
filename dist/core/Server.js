@@ -29,7 +29,7 @@ class Server {
         await this.database.loadTables();
         await this.database.loadManagers();
         if (this.discord)
-            await this.discord.init();
+            this.discord.init();
         await this.app.init();
         executeDaily(() => {
             this.mistral_tokens = {

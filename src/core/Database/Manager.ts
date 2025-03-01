@@ -50,7 +50,7 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
         return Object.entries(where)
             .map(([key, value]) => {
                 if (typeof value === "string") {
-                    return `\`${key}\`='${value.replace(/'/g, "''")}'`;
+                    return `\`${key}\`='${value.replace(/'/g, "''").replace(/\\/g, "\\\\")}'`;
                 } else if (typeof value === "number" || typeof value === "boolean") {
                     return `\`${key}\`=${value}`;
                 } else {
@@ -71,7 +71,7 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
         return Object.entries(values)
             .map(([key, value]) => {
                 if (typeof value === "string") {
-                    return `\`${key}\`='${value.replace(/'/g, "''")}'`;
+                    return `\`${key}\`='${value.replace(/'/g, "''").replace(/\\/g, "\\\\")}'`;
                 } else if (typeof value === "number" || typeof value === "boolean") {
                     return `\`${key}\`=${value}`;
                 } else {
@@ -92,7 +92,7 @@ export default class Manager<PrimaryKeys extends Record<string, any>, Keys exten
         return Object.entries(values)
             .map(([key, value]) => {
                 if (typeof value === "string") {
-                    return `'${value.replace(/'/g, "''")}'`;
+                    return `'${value.replace(/'/g, "''").replace(/\\/g, "\\\\")}'`;
                 } else if (typeof value === "number" || typeof value === "boolean") {
                     return value;
                 } else {

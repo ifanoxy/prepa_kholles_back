@@ -11,11 +11,7 @@ export default function (app: App): string
             return;
         }
 
-        console.log(req.body)
-
         const hashed_password = await app.hash_password(req.body.password);
-
-        console.log(hashed_password)
 
         const user = await app.server.database.users.getIfExists({
             identifiant: req.body.identifiant,

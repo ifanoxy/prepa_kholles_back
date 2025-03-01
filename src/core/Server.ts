@@ -36,7 +36,7 @@ export default class Server {
         await this.database.loadManagers();
 
         if (this.discord)
-            await this.discord.init();
+            this.discord.init();
 
         await this.app.init();
 

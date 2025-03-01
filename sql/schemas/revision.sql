@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS `revision` (
+    id INTEGER UNSIGNED AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    name VARCHAR(128) NOT NULL,
+    week TEXT NOT NULL,
+    text TEXT,
+    demo_id INTEGER UNSIGNED,
+    FOREIGN KEY (demo_id) REFERENCES demonstration(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+)

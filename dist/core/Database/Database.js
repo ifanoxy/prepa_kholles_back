@@ -61,6 +61,7 @@ class Database {
         this.comments = new Manager_1.default(this, "commentaires");
         this.planning = new Manager_1.default(this, "kholle_schedule");
         this.demonstration = new Manager_1.default(this, "demonstration");
+        this.revision = new Manager_1.default(this, "revision");
         this.programmes = new Manager_1.default(this, "programmes");
     }
     /**

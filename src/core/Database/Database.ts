@@ -12,6 +12,7 @@ import { CommentsKeys, CommentsPrimaryKeys } from "../../types/schemas/Comments"
 import { KhollesPlanningKeys, KhollesPlanningPrimaryKeys } from "../../types/schemas/kholles_planning";
 import { DemonstrationKeys, DemonstrationPrimaryKeys } from "../../types/schemas/Demonstration";
 import { ProgrammesKeys, ProgrammesPrimaryKeys } from "../../types/schemas/Programmes";
+import {RevisionKeys, RevisionPrimaryKeys} from "../../types/schemas/Revision";
 
 export default class Database {
     private pool: Pool;
@@ -24,6 +25,7 @@ export default class Database {
     public planning!: Manager<KhollesPlanningPrimaryKeys, KhollesPlanningKeys>;
     public demonstration!: Manager<DemonstrationPrimaryKeys, DemonstrationKeys>;
     public programmes!: Manager<ProgrammesPrimaryKeys, ProgrammesKeys>;
+    public revision!: Manager<RevisionPrimaryKeys, RevisionKeys>;
     public cache: LRUCache<number, SujetsPrimaryKeys & SujetsKeys>;
 
     constructor(private readonly server: Server) {
@@ -57,6 +59,7 @@ export default class Database {
         this.comments = new Manager<CommentsPrimaryKeys, CommentsKeys>(this, "commentaires");
         this.planning = new Manager<KhollesPlanningPrimaryKeys, KhollesPlanningKeys>(this, "kholle_schedule");
         this.demonstration = new Manager<DemonstrationPrimaryKeys, DemonstrationKeys>(this, "demonstration");
+        this.revision = new Manager<RevisionPrimaryKeys, RevisionKeys>(this, "revision");
         this.programmes = new Manager<ProgrammesPrimaryKeys, ProgrammesKeys>(this, "programmes");
     }
 
