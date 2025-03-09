@@ -20,7 +20,7 @@ export default function (app: App): string
             return;
         }
 
-        await app.server.database.chapitres.delete({
+        await app.server.database.sujets.delete({
             id: Number(req.params.sujet_id),
         });
 
