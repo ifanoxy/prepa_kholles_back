@@ -13,13 +13,20 @@ export default function (app: App): string
             return; 
         }
 
+        const params = {
+            before_id: !Number.isNaN(Number(req.query?.before_id)) ? Number(req.query.before_id) : null,
+            matiere_id: req.query?.matiere_id ? Number(req.query.matiere_id) : null,
+            limit: req.query?.limit ? (Number(req.query.limit) <= 20 ? Number(req.query.limit) : 20) : 20,
+            offset: req.query?.offset ? Number(req.query?.offset) : 0,
+        }
+
         function diffDays(date1: Date, date2: Date): number {
             const differenceEnMs = date2.getTime() - date1.getTime();
             return Math.floor(differenceEnMs / (1000 * 60 * 60 * 24));
         }
 
 
-        const demosData = await app.server.database.demonstration.getAll();
+        const demosData = await app.server.database.demonstration.getAll(undefined, '*', { limits: params.limit, offset: params.offset, orderBy: "id DESC", beforeId: params.before_id });
 
         const remaining_day = user.permission == UserPermissions.DEFAULT ? diffDays(new Date(user.last_post_date as string), new Date()) : 0;
 

@@ -11,11 +11,17 @@ function default_1(app) {
             res.status(401).send("Unauthorized");
             return;
         }
+        const params = {
+            before_id: !Number.isNaN(Number(req.query?.before_id)) ? Number(req.query.before_id) : null,
+            matiere_id: req.query?.matiere_id ? Number(req.query.matiere_id) : null,
+            limit: req.query?.limit ? (Number(req.query.limit) <= 20 ? Number(req.query.limit) : 20) : 20,
+            offset: req.query?.offset ? Number(req.query?.offset) : 0,
+        };
         function diffDays(date1, date2) {
             const differenceEnMs = date2.getTime() - date1.getTime();
             return Math.floor(differenceEnMs / (1000 * 60 * 60 * 24));
         }
-        const demosData = await app.server.database.demonstration.getAll();
+        const demosData = await app.server.database.demonstration.getAll(undefined, '*', { limits: params.limit, offset: params.offset, orderBy: "id DESC", beforeId: params.before_id });
         const remaining_day = user.permission == UserPermissions_1.UserPermissions.DEFAULT ? diffDays(new Date(user.last_post_date), new Date()) : 0;
         res.status(200).json({
             data: 14 - remaining_day >= 0 ? await Promise.all(demosData.map(async (x) => ({ ...x, pdf: x?.pdf?.toString() ?? null, author: x.author_id ? await app.server.database.users.get({ id: x.author_id }) : null }))) : [],
