@@ -9,7 +9,7 @@ function default_1(app) {
             res.status(401).send("Unauthorized");
             return;
         }
-        const revisionData = await app.server.database.revision.getAll(undefined, undefined, { orderBy: 'id DESC' });
+        const revisionData = await app.server.database.revision.getAll(undefined, undefined, { orderBy: 'id DESC', limits: 100 });
         res.status(200).json({
             data: revisionData,
         });

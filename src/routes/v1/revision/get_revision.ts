@@ -12,7 +12,7 @@ export default function (app: App): string
             return; 
         }
 
-        const revisionData = await app.server.database.revision.getAll(undefined, undefined, { orderBy: 'id DESC'});
+        const revisionData = await app.server.database.revision.getAll(undefined, undefined, { orderBy: 'id DESC', limits: 100 });
 
         res.status(200).json({
             data: revisionData,

@@ -19,6 +19,7 @@ function default_1(app) {
             name: req.body.name,
             text: req?.body?.text ?? null,
             week: req.body.week,
+            demo_id: req?.body?.demo_id ?? null
         });
         res.status(200).json({ message: `Successfully created` });
     });

@@ -27,7 +27,7 @@ export default function (app: App): string
         if (new_demo_id)
             values['demo_id'] = new_demo_id;
 
-        if (errors.length > 0) {
+        if (errors.length > 0 || Object(values).length == 0) {
             res.status(400).json({ errors });
             return;
         }
