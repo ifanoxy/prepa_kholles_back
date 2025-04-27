@@ -14,9 +14,9 @@ export default function (app: App): string
 
         const errors = app.checkBodyParam(["id"], req.body);
 
-        const { id, new_name, new_week, new_text } = req.body;
+        const { id, new_name, new_week, new_text, new_demo_id } = req.body;
 
-        let values: Partial<{ name: string, week: string, text: string}> = {};
+        let values: Partial<{ name: string, week: string, text: string, demo_id: number}> = {};
 
         if (new_name)
             values['name'] = new_name;
@@ -24,6 +24,8 @@ export default function (app: App): string
             values['week'] = new_week;
         if (new_text)
             values['text'] = new_text;
+        if (new_demo_id)
+            values['demo_id'] = new_demo_id;
 
         if (errors.length > 0) {
             res.status(400).json({ errors });

@@ -6,4 +6,5 @@ export interface RevisionKeys {
     name: string,
     week: string,
     text: string,
+    demo_id?: number,
 }
