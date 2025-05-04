@@ -7,6 +7,7 @@ export default function (app: App): string
         const token = req.headers?.authorization?.split(' ')[1];
         const user_id = token ? await app.isAuth(token) : null;
         const user = user_id ? await app.server.database.users.getIfExists({ id: user_id }, ['last_post_date', 'permission']) : null;
+
         if (!user_id || !user)
         {
             res.status(401).send("Unauthorized");

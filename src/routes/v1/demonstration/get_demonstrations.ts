@@ -38,7 +38,7 @@ export default function (app: App): string
                 data: 14 - remaining_day >= 0 ? demosData : [],
             })
         else res.status(200).json({
-            data: 14 - remaining_day >= 0 ? await Promise.all(demosData.map(async x => ({...x, pdf: x?.pdf?.toString() ?? null, author: x.author_id ? await app.server.database.users.get({ id: x.author_id }) : null}))) : [],
+            data: 14 - remaining_day >= 0 ? await Promise.all(demosData.map(async x => ({...x, pdf: x?.pdf?.toString() ?? null, author: x.author_id ? await app.server.database.users.get({ id: x.author_id }, ['id', 'last_name', 'first_name']) : null}))) : [],
             remaining_day: 14 - remaining_day
         });
     });
